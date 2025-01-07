@@ -136,7 +136,7 @@ const UserDashboard = ({
                   onClick={() => handleViewDetails(product)}
                 >
                   <img
-                    src={product.image}
+                    src={`${process.env.PUBLIC_URL}/${product.image}`}
                     alt={product.name}
                     className="w-full h-64 object-cover mb-2 rounded"
                   />

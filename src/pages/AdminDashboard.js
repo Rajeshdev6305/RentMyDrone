@@ -217,7 +217,11 @@ const AdminDashboard = ({ products, setProducts }) => {
               .filter((product) => filteredProducts.includes(product))
               .map((product) => (
                 <div key={product.id} className="border p-4 shadow hover:shadow-lg rounded-lg transition">
-                  <img src={product.image} alt={product.name} className="w-full h-64 object-cover mb-2 rounded" />
+                  <img
+                    src={`${process.env.PUBLIC_URL}/${product.image}`}
+                    alt={product.name}
+                    className="w-full h-64 object-cover mb-2 rounded"
+                  />
                   <h3 className="text-lg font-bold">{product.name}</h3>
                   <p className="text-sm">{product.description}</p>
                   <p className="text-sm text-blue-600 font-bold">${product.pricePerDay} per day</p>{/* Change to pricePerDay */}

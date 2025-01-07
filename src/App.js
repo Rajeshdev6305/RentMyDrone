@@ -71,7 +71,8 @@ const App = () => {
         pricePerDay: 180,
         pricePerMonth: 4000,
         category: "Marriage",
-        image: "marriage drone x4.jpg",      },
+        image: "marriage drone x4.jpg",    
+        },
       {
         id: 5,
         name: "Marriage Drone X5",

@@ -88,7 +88,11 @@ const MainBody = ({ isLoggedIn, setCartItems, cartItems, products, searchTerm })
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {filteredProducts.map((product) => (
           <div key={product.id} className="border p-4 shadow hover:shadow-lg rounded-lg transition">
-            <img src={product.image} alt={product.name} className="w-full h-64 object-cover mb-2 rounded" />
+            <img
+              src={`${process.env.PUBLIC_URL}/${product.image}`}
+              alt={product.name}
+              className="w-full h-64 object-cover mb-2 rounded"
+            />
             <h3 className="text-lg font-bold">{product.name}</h3>
             <p className="text-sm">{product.description}</p>
             <p className="text-sm text-blue-600 font-bold">${product.pricePerDay} per day</p>
