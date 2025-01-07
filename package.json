@@ -1,5 +1,5 @@
 {
-  "homepage": "https://Rajeshdev6305.github.io/drone-delivery-service/.",
+  "homepage": "https://Rajeshdev6305.github.io/Drone-Delivery-Service-App",
   "name": "drone-delivery-service",
   "version": "0.1.0",
   "private": true,
@@ -20,7 +20,7 @@
   },
   "scripts": {
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build -r https://github.com/Rajeshdev6305/drone-delivery-service.git",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
