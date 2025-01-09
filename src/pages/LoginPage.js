@@ -39,7 +39,9 @@ const LoginPage = ({ setIsLoggedIn, setUserType }) => {
 
   return (
     <div className="">
-      <h2 className="text-xl font-bold mb-4">Login</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold mb-4">Login</h2>
+      </div>
       <form onSubmit={handleLogin} className="space-y-4">
         <input
           type="email"

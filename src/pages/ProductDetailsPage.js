@@ -156,17 +156,19 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
 
   return (
     <div className="">
-      <button
-        onClick={() => navigate(-1)}
-        className="bg-gray-600 text-white px-4 py-2 rounded mb-4 flex items-center space-x-2"
-      >
-        <FaArrowLeft />
-        <span>Back</span>
-      </button>
+      <div className="flex justify-between items-center mb-4">
+        <button
+          onClick={() => navigate(-1)}
+          className="bg-gray-600 text-white px-4 py-2 rounded mb-4 flex items-center space-x-2"
+        >
+          <FaArrowLeft />
+          <span>Back</span>
+        </button>
+      </div>
       <h2 className="text-xl font-bold mb-4">{product.name}</h2>
       <img
-        src={`${process.env.PUBLIC_URL}/${product.image}`}
-        alt={product.name}
+                    src={product.image.startsWith('data:image') ? product.image : `${process.env.PUBLIC_URL}/${product.image}`}
+                    alt={product.name}
         className="w-80 h-50 object-cover mb-2 rounded"
       />
       {bookingType === "day" && <p className="text-sm text-blue-600 font-bold">${product.pricePerDay} per day</p>}

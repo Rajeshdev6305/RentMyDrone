@@ -4,6 +4,7 @@ import {
   Routes,
   Route,
   Navigate,
+  useLocation,
 } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -17,6 +18,17 @@ import AdminDashboard from "./pages/AdminDashboard";
 import "./index.css"; // Ensure Tailwind CSS is imported
 import "./App.css"; // Import App.css for custom styles
 import ProductDetailsPage from "./pages/ProductDetailsPage";
+import LoadingSpinner from "./components/LoadingSpinner"; // Import LoadingSpinner component
+
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+};
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // User login state
@@ -24,6 +36,7 @@ const App = () => {
   const [cartItems, setCartItems] = useState([]); // Cart items state
   const [products, setProducts] = useState([]); // Products state
   const [searchTerm, setSearchTerm] = useState(""); // Search term state
+  const [currentAdmin, setCurrentAdmin] = useState(""); // Current admin state
 
   useEffect(() => {
     // Mock data for products
@@ -206,6 +219,7 @@ const App = () => {
 
   return (
     <Router>
+      <ScrollToTop />
       <div className="flex flex-col min-h-screen bg-gray-100">
         {/* Header */}
         <Header
@@ -273,6 +287,7 @@ const App = () => {
                   <AdminDashboard
                     products={products}
                     setProducts={setProducts}
+                    currentAdmin={currentAdmin} // Pass currentAdmin prop
                   />
                 ) : (
                   <Navigate to="/login" />

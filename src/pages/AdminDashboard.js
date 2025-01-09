@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
 
-const AdminDashboard = ({ products, setProducts }) => {
+const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
   const [formData, setFormData] = useState({
     name: "",
     model: "",
@@ -29,6 +29,15 @@ const AdminDashboard = ({ products, setProducts }) => {
   const navigate = useNavigate();
   const imageInputRef = useRef(null);
   const formRef = useRef(null);
+
+  useEffect(() => {
+    const storedProducts = JSON.parse(localStorage.getItem("products")) || [];
+    setProducts(storedProducts);
+  }, [setProducts]);
+
+  useEffect(() => {
+    localStorage.setItem("products", JSON.stringify(products));
+  }, [products]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -61,10 +70,12 @@ const AdminDashboard = ({ products, setProducts }) => {
       const newProduct = {
         id: Date.now(),
         ...formData,
-        addedBy: "admin", // Assuming the admin is adding the product
+        addedBy: currentAdmin, // Assuming the admin is adding the product
+        image: formData.image, // Ensure image is included
       };
       const updatedProducts = [...products, newProduct].sort((a, b) => a.category.localeCompare(b.category));
       setProducts(updatedProducts);
+      localStorage.setItem("products", JSON.stringify(updatedProducts)); // Save new products permanently in local storage
       alert("Product added successfully!");
     }
     setFormData({
@@ -101,6 +112,7 @@ const AdminDashboard = ({ products, setProducts }) => {
   const handleDeleteProduct = (productId) => {
     const updatedProducts = products.filter((product) => product.id !== productId);
     setProducts(updatedProducts);
+    localStorage.setItem("products", JSON.stringify(updatedProducts)); // Update local storage after deletion
     alert("Product deleted successfully!");
   };
 
@@ -113,7 +125,7 @@ const AdminDashboard = ({ products, setProducts }) => {
   }, {});
 
   const filteredProducts = viewMyProducts
-    ? products.filter((product) => product.addedBy === "admin")
+    ? products.filter((product) => product.addedBy === currentAdmin)
     : products;
 
   return (
@@ -198,13 +210,15 @@ const AdminDashboard = ({ products, setProducts }) => {
       </form>
       <div className="flex justify-between items-center mt-8 mb-4">
         <h2 className="text-xl font-bold">Available Products</h2>
-        <button
-          onClick={() => setViewMyProducts(!viewMyProducts)}
-          className="bg-blue-600 text-white px-2 py-1 text-sm rounded hover:bg-blue-700 transition flex items-center space-x-2"
-        >
-          {viewMyProducts ? <FaEyeSlash /> : <FaEye />}
-          <span>{viewMyProducts ? "View All Products" : "View My Products"}</span>
-        </button>
+        <div>
+          <button
+            onClick={() => setViewMyProducts(!viewMyProducts)}
+            className="bg-blue-600 text-white px-2 py-1 text-sm rounded hover:bg-blue-700 transition flex items-center space-x-2"
+          >
+            {viewMyProducts ? <FaEyeSlash /> : <FaEye />}
+            <span>{viewMyProducts ? "View All Products" : "View My Products"}</span>
+          </button>
+        </div>
       </div>
       {Object.keys(groupedProducts).length === 0 && (
         <p className="text-center text-gray-600">No products available.</p>
@@ -218,7 +232,7 @@ const AdminDashboard = ({ products, setProducts }) => {
               .map((product) => (
                 <div key={product.id} className="border p-4 shadow hover:shadow-lg rounded-lg transition">
                   <img
-                    src={`${process.env.PUBLIC_URL}/${product.image}`}
+                    src={product.image.startsWith('data:image') ? product.image : `${process.env.PUBLIC_URL}/${product.image}`}
                     alt={product.name}
                     className="w-full h-64 object-cover mb-2 rounded"
                   />
@@ -226,22 +240,24 @@ const AdminDashboard = ({ products, setProducts }) => {
                   <p className="text-sm">{product.description}</p>
                   <p className="text-sm text-blue-600 font-bold">${product.pricePerDay} per day</p>{/* Change to pricePerDay */}
                   <p className="text-xs text-gray-600">{product.category}</p>
-                  <div className="flex justify-between mt-2">
-                    <button
-                      onClick={() => handleEditProduct(product)}
-                      className="bg-yellow-500 text-white px-2 py-1 text-sm rounded mr-2 flex items-center space-x-2"
-                    >
-                      <FaEdit />
-                      <span>Edit</span>
-                    </button>
-                    <button
-                      onClick={() => handleDeleteProduct(product.id)}
-                      className="bg-red-500 text-white px-2 py-1 text-sm rounded flex items-center space-x-2"
-                    >
-                      <FaTrash />
-                      <span>Delete</span>
-                    </button>
-                  </div>
+                  {product.addedBy === currentAdmin && (
+                    <div className="flex justify-between mt-2">
+                      <button
+                        onClick={() => handleEditProduct(product)}
+                        className="bg-yellow-500 text-white px-2 py-1 text-sm rounded mr-2 flex items-center space-x-2"
+                      >
+                        <FaEdit />
+                        <span>Edit</span>
+                      </button>
+                      <button
+                        onClick={() => handleDeleteProduct(product.id)}
+                        className="bg-red-500 text-white px-2 py-1 text-sm rounded flex items-center space-x-2"
+                      >
+                        <FaTrash />
+                        <span>Delete</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
           </div>
