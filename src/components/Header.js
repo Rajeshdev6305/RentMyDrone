@@ -579,10 +579,14 @@ const Header = ({
         {menuOpen ? <FaTimes /> : <FaBars />}
       </button>
       <nav
-        className={`flex-col md:flex-row md:flex items-center space-x-4 ${menuOpen ? "flex" : "hidden"} md:flex`}
+        className={`flex-col md:flex-row md:flex items-center space-x-4 ${
+          menuOpen ? "flex" : "hidden"
+        } md:flex`}
       >
         <div
-          className={`flex-col md:flex-row md:flex items-center space-x-4 ${menuOpen ? "flex" : "hidden"} md:flex md:mr-auto`}
+          className={`flex-col md:flex-row md:flex items-center space-x-4 ${
+            menuOpen ? "flex" : "hidden"
+          } md:flex md:mr-auto`}
         >
           {!isLoggedIn && (
             <button
@@ -652,21 +656,20 @@ const Header = ({
             <FaEnvelope />
             <span>Contact Us</span>
           </button>
-         {/* Only show Cart for regular users, not admin */}
-         {userType !== "admin" && (
-                <button
-                  onClick={handleCartClick}
-                  className="text-white px-2 py-1 text-sm hover:text-gray-300 transition flex items-center space-x-2 mb-2 md:mb-0"
-                >
-                  <FaShoppingCart />
-                  <span>Cart</span>
-                  {cartCount > 0 && (
-                    <span className="bg-red-600 text-white rounded-full px-2 py-1 text-xs ml-2">
-                      {cartCount}
-                    </span>
-                  )}
-                </button>
+          {isLoggedIn && userType !== "admin" && (
+            <button
+              onClick={handleCartClick}
+              className="text-white px-2 py-1 text-sm hover:text-gray-300 transition flex items-center space-x-2 mb-2 md:mb-0"
+            >
+              <FaShoppingCart />
+              <span>Cart</span>
+              {cartCount > 0 && (
+                <span className="bg-red-600 text-white rounded-full px-2 py-1 text-xs ml-2">
+                  {cartCount}
+                </span>
               )}
+            </button>
+          )}
         </div>
         {isLoggedIn && (
           <div className="relative">
