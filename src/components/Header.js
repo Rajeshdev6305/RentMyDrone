@@ -415,7 +415,7 @@ const Header = ({
               <span>Profile</span>
             </button>
             {profileMenuOpen && (
-              <div className="absolute right-- top-8 md:top-10  md:right-0 mt-2 w-48  bg-white text-black rounded shadow-lg z-50">
+              <div className="absolute right-0 top-8 md:top-10  md:right-0 mt-2 w-48  bg-white text-black rounded shadow-lg z-50">
                 <div className="p-4">
                   {userDetails && (
                     <>
