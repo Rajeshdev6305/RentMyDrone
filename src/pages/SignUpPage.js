@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { auth } from "../Authentication/firebaseConfig"; // Replace with the correct path to your Firebase config
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
@@ -16,7 +18,7 @@ const SignUpPage = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSignUp = (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
@@ -24,19 +26,48 @@ const SignUpPage = () => {
       return;
     }
 
-    // Store user details in local storage
-    const userDetails = { email: formData.email, password: formData.password, userType: formData.type };
-    localStorage.setItem(formData.email, JSON.stringify(userDetails));
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
 
-    alert("Sign-Up successful!");
-    navigate("/login");
+      const user = userCredential.user;
+
+      // Retrieve existing users from local storage
+      const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
+
+      // Check if the email already exists
+      const existingUser = storedUsers.find((u) => u.email === formData.email);
+      if (existingUser) {
+        alert("Email already exists. Please use a different email.");
+        return;
+      }
+
+      // Add new user to the list
+      const newUser = {
+        email: formData.email,
+        password: formData.password,
+        userType: formData.type,
+        username: formData.username,
+      };
+      storedUsers.push(newUser);
+
+      // Store updated users list in local storage
+      localStorage.setItem("users", JSON.stringify(storedUsers));
+
+      alert("Sign-Up successful!");
+      navigate("/login");
+    } catch (error) {
+      console.error("Error during sign-up:", error.message);
+      alert("Error during sign-up. Please try again.");
+    }
   };
 
   return (
-    <div className="">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold mb-4">Sign Up</h2>
-      </div>
+    <div className="p-4 max-w-md mx-auto">
+      <h2 className="text-xl font-bold mb-4">Sign Up</h2>
       <form onSubmit={handleSignUp} className="space-y-4">
         <select
           name="type"
@@ -92,7 +123,10 @@ const SignUpPage = () => {
           className="w-full p-2 border"
           required
         />
-        <button type="submit" className="w-full bg-blue-600 text-white px-2 py-1 text-xs rounded">
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white px-4 py-2 rounded"
+        >
           Sign Up
         </button>
       </form>

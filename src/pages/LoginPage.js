@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth } from "../firebase";
+import { auth } from "../Authentication/firebaseConfig"; // Replace with the correct path to your Firebase config
 import { signInWithEmailAndPassword } from "firebase/auth";
 
 const LoginPage = ({ setIsLoggedIn, setUserType }) => {
@@ -13,12 +13,25 @@ const LoginPage = ({ setIsLoggedIn, setUserType }) => {
     e.preventDefault();
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
       const user = userCredential.user;
 
-      // Retrieve user details from local storage
-      const storedUserDetails = JSON.parse(localStorage.getItem(email));
-      if (storedUserDetails && storedUserDetails.password === password && storedUserDetails.userType === userType) {
+      // Retrieve all users from local storage
+      const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
+
+      // Find the user with the matching email
+      const storedUserDetails = storedUsers.find((u) => u.email === email);
+
+      if (
+        storedUserDetails &&
+        storedUserDetails.password === password &&
+        storedUserDetails.userType === userType
+      ) {
         setUserType(storedUserDetails.userType);
         setIsLoggedIn(true);
 
@@ -29,7 +42,7 @@ const LoginPage = ({ setIsLoggedIn, setUserType }) => {
           navigate("/user-dashboard");
         }
       } else {
-        alert("Invalid email or password. Please try again.");
+        alert("Invalid email, password, or user type. Please try again.");
       }
     } catch (error) {
       console.error("Error during login:", error.message);
@@ -38,10 +51,8 @@ const LoginPage = ({ setIsLoggedIn, setUserType }) => {
   };
 
   return (
-    <div className="">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold mb-4">Login</h2>
-      </div>
+    <div className="p-4 max-w-md mx-auto">
+      <h2 className="text-xl font-bold mb-4">Login</h2>
       <form onSubmit={handleLogin} className="space-y-4">
         <input
           type="email"
@@ -68,12 +79,18 @@ const LoginPage = ({ setIsLoggedIn, setUserType }) => {
           <option value="user">User</option>
           <option value="admin">Admin</option>
         </select>
-        <button type="submit" className="w-full bg-blue-600 text-white px-2 py-1 text-sm rounded">
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white px-4 py-2 rounded"
+        >
           Login
         </button>
       </form>
       <p className="text-sm mt-4">
-        Don't have an account? <a href="/signup" className="text-blue-600">Sign Up</a>
+        Don't have an account?{" "}
+        <a href="/SignUp" className="text-blue-600">
+          Sign Up
+        </a>
       </p>
     </div>
   );

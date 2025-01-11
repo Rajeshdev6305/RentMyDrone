@@ -70,7 +70,7 @@ const UserDashboard = ({
     <div className="">
       <header className="flex justify-between items-center mb-4">
         <h1 className="text-xl font-bold">User Dashboard</h1>
-        <div>
+        {/* <div>
           <button
             onClick={handleLogout}
             className="bg-red-600 text-white px-2 py-1 text-sm rounded hover:bg-red-700 transition flex items-center space-x-2"
@@ -78,7 +78,7 @@ const UserDashboard = ({
             <FaSignOutAlt />
             <span>Logout</span>
           </button>
-        </div>
+        </div> */}
       </header>
       <div className="flex justify-center mb-4 space-x-2">
         <button
