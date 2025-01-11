@@ -37,6 +37,7 @@ const App = () => {
   const [products, setProducts] = useState([]); // Products state
   const [searchTerm, setSearchTerm] = useState(""); // Search term state
   const [currentAdmin, setCurrentAdmin] = useState(""); // Current admin state
+  const [isGuest, setIsGuest] = useState(false); // Guest login state
 
   useEffect(() => {
     // Mock data for products
@@ -217,6 +218,7 @@ const App = () => {
   };
 
   return (
+    
     <Router>
       <ScrollToTop />
       <div className="flex flex-col min-h-screen bg-gray-100">

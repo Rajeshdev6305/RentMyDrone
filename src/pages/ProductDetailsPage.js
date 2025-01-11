@@ -173,6 +173,8 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
       />
       {bookingType === "day" && <p className="text-sm text-blue-600 font-bold">${product.pricePerDay} per day</p>}
       {bookingType === "month" && <p className="text-sm text-blue-600 font-bold">${product.pricePerMonth} per month</p>}
+      {bookingType === "hour" && <p className="text-sm text-blue-600 font-bold">${product.pricePerHour} per hour</p>}
+
       <p className="text-base">{product.description}</p>
       <p className="text-sm text-gray-600">Category: {product.category}</p>
       <p className="text-sm text-gray-600">Model: {product.model}</p>
