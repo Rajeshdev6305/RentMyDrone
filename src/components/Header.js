@@ -221,7 +221,6 @@
 // };
 
 // export default Header;
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -231,12 +230,10 @@ import {
   FaEnvelope,
   FaSignInAlt,
   FaUserPlus,
-  FaShoppingCart,
   FaSignOutAlt,
-  FaProductHunt,
+  FaUserCircle,
   FaBars,
   FaTimes,
-  FaUserCircle,
 } from "react-icons/fa";
 import { auth } from "../Authentication/firebaseConfig";
 
@@ -263,7 +260,7 @@ const Header = ({
     if (isLoggedIn) {
       const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
       const currentUser = storedUsers.find(
-        (user) => user.email === auth.currentUser.email
+        (user) => user.email === auth.currentUser?.email
       );
       if (currentUser) {
         setUserDetails(currentUser);
@@ -338,14 +335,16 @@ const Header = ({
           )}
         </div>
       )}
-      <button onClick={toggleMenu} className="md:hidden absolute top-4 right-4 ">
+      <button onClick={toggleMenu} className="md:hidden absolute top-4 right-4">
         {menuOpen ? <FaTimes /> : <FaBars />}
       </button>
       <nav
-        className={`flex-col md:flex-row md:flex items-center  space-x-4 ${menuOpen ? "flex" : "hidden"} md:flex`}
+        className={`flex-col md:flex-row md:flex items-center space-x-4 ${
+          menuOpen ? "flex" : "hidden"
+        } md:flex`}
       >
         <div
-          className={`flex-col md:flex-row md:flex items-center space-x-4  ${
+          className={`flex-col md:flex-row md:flex items-center space-x-4 ${
             menuOpen ? "flex" : "hidden"
           } md:flex md:mr-auto`}
         >
@@ -381,6 +380,23 @@ const Header = ({
                 <FaUserPlus />
                 <span>Sign Up</span>
               </button>
+              <button
+                onClick={() => {
+                  // Guest login logic
+                  setIsLoggedIn(true); // Set logged-in state
+                  setUserDetails({
+                    username: "Guest",
+                    email: "guest@example.com",
+                    userType: "Guest",
+                  }); // Mock guest user details
+                  navigate("/"); // Redirect to homepage or dashboard
+                  setMenuOpen(false); // Close menu
+                }}
+                className="text-white px-2 py-1 text-sm hover:text-gray-300 transition flex items-center space-x-2 mb-2 md:mb-0"
+              >
+                <FaUserCircle />
+                <span>Guest</span>
+              </button>
             </>
           )}
           <button
@@ -415,7 +431,7 @@ const Header = ({
               <span>Profile</span>
             </button>
             {profileMenuOpen && (
-              <div className="absolute right-0 top-8 md:top-10  md:right-0 mt-2 w-48  bg-white text-black rounded shadow-lg z-50">
+              <div className="absolute right-0 top-8 md:top-10 mt-2 w-48 bg-white text-black rounded shadow-lg z-50">
                 <div className="p-4">
                   {userDetails && (
                     <>
