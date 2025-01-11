@@ -39,29 +39,32 @@ const SignUpPage = () => {
       const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
 
       // Check if the email already exists
-      const existingUser = storedUsers.find((u) => u.email === formData.email);
+      const existingUser = storedUsers.find(
+        (storedUser) => storedUser.email === formData.email
+      );
+
       if (existingUser) {
-        alert("Email already exists. Please use a different email.");
+        alert("User with this email already exists.");
         return;
       }
 
-      // Add new user to the list
+      // Save new user data to local storage
       const newUser = {
-        email: formData.email,
-        password: formData.password,
         userType: formData.type,
         username: formData.username,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
       };
-      storedUsers.push(newUser);
 
-      // Store updated users list in local storage
+      storedUsers.push(newUser);
       localStorage.setItem("users", JSON.stringify(storedUsers));
 
-      alert("Sign-Up successful!");
+      alert("Account created successfully!");
       navigate("/login");
     } catch (error) {
       console.error("Error during sign-up:", error.message);
-      alert("Error during sign-up. Please try again.");
+      alert("Error occurred during sign-up. Please try again.");
     }
   };
 
@@ -69,15 +72,6 @@ const SignUpPage = () => {
     <div className="p-4 max-w-md mx-auto">
       <h2 className="text-xl font-bold mb-4">Sign Up</h2>
       <form onSubmit={handleSignUp} className="space-y-4">
-        <select
-          name="type"
-          value={formData.type}
-          onChange={handleChange}
-          className="w-full p-2 border"
-        >
-          <option value="user">User</option>
-          <option value="admin">Admin</option>
-        </select>
         <input
           type="text"
           name="username"
@@ -105,6 +99,16 @@ const SignUpPage = () => {
           className="w-full p-2 border"
           required
         />
+        <select
+          name="type"
+          value={formData.type}
+          onChange={handleChange}
+          className="w-full p-2 border"
+          required
+        >
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
         <input
           type="password"
           name="password"
@@ -130,6 +134,12 @@ const SignUpPage = () => {
           Sign Up
         </button>
       </form>
+      <p className="text-sm mt-4">
+        Already have an account?{" "}
+        <a href="/login" className="text-blue-600">
+          Login
+        </a>
+      </p>
     </div>
   );
 };
