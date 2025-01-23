@@ -6,7 +6,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
     type: "user", // Default to "user"
-    username: "",
+    username: "",   
     email: "",
     phone: "",
     password: "",
