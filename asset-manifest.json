@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/Drone-delivery-app/static/css/main.af7e2d40.css",
+    "main.css": "/Drone-delivery-app/static/css/main.aa5f503a.css",
     "main.js": "/Drone-delivery-app/static/js/main.c93cd462.js",
     "static/js/488.33d0d58b.chunk.js": "/Drone-delivery-app/static/js/488.33d0d58b.chunk.js",
     "index.html": "/Drone-delivery-app/index.html",
-    "main.af7e2d40.css.map": "/Drone-delivery-app/static/css/main.af7e2d40.css.map",
+    "main.aa5f503a.css.map": "/Drone-delivery-app/static/css/main.aa5f503a.css.map",
     "main.c93cd462.js.map": "/Drone-delivery-app/static/js/main.c93cd462.js.map",
     "488.33d0d58b.chunk.js.map": "/Drone-delivery-app/static/js/488.33d0d58b.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.af7e2d40.css",
+    "static/css/main.aa5f503a.css",
     "static/js/main.c93cd462.js"
   ]
 }
