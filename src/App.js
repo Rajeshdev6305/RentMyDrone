@@ -18,7 +18,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import "./index.css"; // Ensure Tailwind CSS is imported
 import "./App.css"; // Import App.css for custom styles
 import ProductDetailsPage from "./pages/ProductDetailsPage";
-import LoadingSpinner from "./components/LoadingSpinner"; // Import LoadingSpinner component
+// import LoadingSpinner from "./components/LoadingSpinner"; // Import LoadingSpinner component
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -209,12 +209,12 @@ const App = () => {
     setProducts(productList);
   }, []);
 
-  const handleRefresh = () => {
-    return new Promise((resolve) => {
-      window.location.reload();
-      resolve();
-    });
-  };
+  // const handleRefresh = () => {
+  //   return new Promise((resolve) => {
+  //     window.location.reload();
+  //     resolve();
+  //   });
+  // };
 
   return (
     
