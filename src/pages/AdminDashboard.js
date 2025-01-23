@@ -272,7 +272,6 @@
 
 // export default AdminDashboard;
 
-
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
@@ -388,7 +387,9 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
   };
 
   const handleDeleteProduct = (productId) => {
-    const updatedProducts = products.filter((product) => product.id !== productId);
+    const updatedProducts = products.filter(
+      (product) => product.id !== productId
+    );
     setProducts(updatedProducts);
     alert("Product deleted successfully!");
   };
@@ -407,7 +408,9 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
 
   return (
     <div>
-      <h2 className="text-xl font-bold mb-4">{editingProduct ? "Edit Product" : "Add New Product"}</h2>
+      <h2 className="text-xl font-bold mb-4">
+        {editingProduct ? "Edit Product" : "Add New Product"}
+      </h2>
       <form onSubmit={handleAddProduct} className="space-y-4" ref={formRef}>
         <input
           type="text"
@@ -470,9 +473,16 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
           className="w-full p-2 border"
         />
         {imagePreview && (
-          <img src={imagePreview} alt="Preview" className="w-80 h-100 object-cover mb-2 rounded" />
+          <img
+            src={imagePreview}
+            alt="Preview"
+            className="w-80 h-100 object-cover mb-2 rounded"
+          />
         )}
-        <button type="submit" className="w-full bg-blue-600 text-white px-2 py-1 text-sm rounded">
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white px-2 py-1 text-sm rounded"
+        >
           {editingProduct ? "Update Product" : "Add Product"}
         </button>
       </form>
@@ -483,7 +493,9 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
           className="bg-blue-600 text-white px-2 py-1 text-sm rounded hover:bg-blue-700 transition flex items-center space-x-2"
         >
           {viewMyProducts ? <FaEyeSlash /> : <FaEye />}
-          <span>{viewMyProducts ? "View All Products" : "View My Products"}</span>
+          <span>
+            {viewMyProducts ? "View All Products" : "View My Products"}
+          </span>
         </button>
       </div>
       {Object.keys(groupedProducts).map((category) => (
@@ -493,15 +505,24 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
             {groupedProducts[category]
               .filter((product) => filteredProducts.includes(product))
               .map((product) => (
-                <div key={product.id} className="border p-4 shadow hover:shadow-lg rounded-lg transition">
+                <div
+                  key={product.id}
+                  className="border p-4 shadow hover:shadow-lg rounded-lg transition"
+                >
                   <img
-                    src={product.image.startsWith("data:image") ? product.image : `${process.env.PUBLIC_URL}/${product.image}`}
+                    src={
+                      product.image.startsWith("data:image")
+                        ? product.image
+                        : `${process.env.PUBLIC_URL}/${product.image}`
+                    }
                     alt={product.name}
                     className="w-full h-64 object-cover mb-2 rounded"
                   />
                   <h3 className="text-lg font-bold">{product.name}</h3>
                   <p className="text-sm">{product.description}</p>
-                  <p className="text-sm text-blue-600 font-bold">${product.pricePerDay} per day</p>
+                  <p className="text-sm text-blue-600 font-bold">
+                    ${product.pricePerDay} per day
+                  </p>
                   <p className="text-xs text-gray-600">{product.category}</p>
                   {product.addedBy === currentAdmin && (
                     <div className="flex justify-between mt-2">

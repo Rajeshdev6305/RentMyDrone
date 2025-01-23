@@ -72,6 +72,17 @@ const SignUpPage = () => {
     <div className="p-4 max-w-md mx-auto">
       <h2 className="text-xl font-bold mb-4">Sign Up</h2>
       <form onSubmit={handleSignUp} className="space-y-4">
+      <select
+          name="type"
+          value={formData.type}
+          onChange={handleChange}
+          className="w-full p-2 border"
+          required
+        >
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
+        
         <input
           type="text"
           name="username"
@@ -99,16 +110,7 @@ const SignUpPage = () => {
           className="w-full p-2 border"
           required
         />
-        <select
-          name="type"
-          value={formData.type}
-          onChange={handleChange}
-          className="w-full p-2 border"
-          required
-        >
-          <option value="user">User</option>
-          <option value="admin">Admin</option>
-        </select>
+      
         <input
           type="password"
           name="password"

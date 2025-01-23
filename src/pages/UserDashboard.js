@@ -85,8 +85,8 @@ const UserDashboard = ({
           onClick={() => handleCategoryChange("All")}
           className={`px-2 py-1 text-sm rounded ${
             selectedCategory === "All"
-              ? "text-white-600"
-              : "bg-blue-600 text-white px-2 py-1 text-sm rounded hover:bg-blue-700 transition flex items-center space-x-2"
+              ? "bg-blue-600 text-white"
+              : "text-gray-600 border border-gray-300 hover:text-gray-800"
           }`}
         >
           All
@@ -95,8 +95,8 @@ const UserDashboard = ({
           onClick={() => handleCategoryChange("Marriage")}
           className={`px-2 py-1 text-sm rounded ${
             selectedCategory === "Marriage"
-              ? "text-white-600"
-              : "bg-blue-600 text-white px-2 py-1 text-sm rounded hover:bg-blue-700 transition flex items-center space-x-2"
+              ? "bg-blue-600 text-white"
+              : "text-gray-600 border border-gray-300 hover:text-gray-800"
           }`}
         >
           Marriage
@@ -105,8 +105,8 @@ const UserDashboard = ({
           onClick={() => handleCategoryChange("Food Delivery")}
           className={`px-2 py-1 text-sm rounded ${
             selectedCategory === "Food Delivery"
-              ? "text-white-600"
-              : "bg-blue-600 text-white px-2 py-1 text-sm rounded hover:bg-blue-700 transition flex items-center space-x-2"
+              ? "bg-blue-600 text-white"
+              : "text-gray-600 border border-gray-300 hover:text-gray-800"
           }`}
         >
           Food Delivery
@@ -115,13 +115,14 @@ const UserDashboard = ({
           onClick={() => handleCategoryChange("Farming")}
           className={`px-2 py-1 text-sm rounded ${
             selectedCategory === "Farming"
-              ? "text-white-600"
-              : "bg-blue-600 text-white px-2 py-1 text-sm rounded hover:bg-blue-700 transition flex items-center space-x-2"
+              ? "bg-blue-600 text-white"
+              : "text-gray-600 border border-gray-300 hover:text-gray-800"
           }`}
         >
           Farming
         </button>
       </div>
+
       <h2 className="text-xl font-bold mb-4">Available Drones</h2>
       {Object.keys(groupedProducts).map((category) => (
         <div key={category}>
@@ -136,7 +137,11 @@ const UserDashboard = ({
                   onClick={() => handleViewDetails(product)}
                 >
                   <img
-                    src={product.image.startsWith('data:image') ? product.image : `${process.env.PUBLIC_URL}/${product.image}`}
+                    src={
+                      product.image.startsWith("data:image")
+                        ? product.image
+                        : `${process.env.PUBLIC_URL}/${product.image}`
+                    }
                     alt={product.name}
                     className="w-full h-64 object-cover mb-2 rounded"
                   />
