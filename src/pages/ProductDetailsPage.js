@@ -259,9 +259,10 @@ const ProductDetailsPage = ({
           onChange={(e) => setBookingType(e.target.value)}
           className="w-full p-2 border rounded"
         >
+
+          <option value="hour">Hour</option>
           <option value="day">Day</option>
           <option value="month">Month</option>
-          <option value="hour">Hour</option>
         </select>
       </div>
 

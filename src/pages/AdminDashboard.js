@@ -124,8 +124,7 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
     if (!acc[product.category]) {
       acc[product.category] = [];
     }
-    acc[product.category].push(product);
-    return acc;
+    acc[product.category].push(product);  return acc;
   }, {});
 
   const filteredProducts = viewMyProducts
@@ -170,6 +169,15 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
           name="pricePerDay"
           placeholder="Price Per Day"
           value={formData.pricePerDay}
+          onChange={handleChange}
+          className="w-full p-2 border"
+          required
+        />
+         <input
+          type="number"
+          name="pricePerMonth"
+          placeholder="Price Per Month"
+          value={formData.pricePerMonth}
           onChange={handleChange}
           className="w-full p-2 border"
           required
