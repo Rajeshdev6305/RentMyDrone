@@ -126,7 +126,6 @@
 
 // export default LoginPage;
 
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../Authentication/firebaseConfig"; // Update the path as needed
@@ -179,8 +178,13 @@ const LoginPage = ({ setIsLoggedIn, setUserType }) => {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Retrieve all users from local storage
+      // Safely retrieve stored users from local storage
       const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
+
+      // Check if `storedUsers` is an array
+      if (!Array.isArray(storedUsers)) {
+        throw new Error("Stored users data is invalid.");
+      }
 
       // Find the user with the matching email
       const storedUser = storedUsers.find((u) => u.email === email);
