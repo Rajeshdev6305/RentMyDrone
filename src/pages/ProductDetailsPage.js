@@ -2,7 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaCartPlus, FaCalendarAlt, FaStar } from "react-icons/fa";
 
-const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => {
+const ProductDetailsPage = ({
+  products = [],
+  setCartItems,
+  cartItems = [],
+}) => {
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -18,7 +22,7 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
   const [product, setProduct] = useState(null);
 
   const reviews = {
-    "Marriage": [
+    Marriage: [
       {
         user: "John Doe",
         rating: 4,
@@ -42,7 +46,7 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
         comment: "Kept the food warm and delivered on time.",
       },
     ],
-    "Farming": [
+    Farming: [
       {
         user: "Charlie Davis",
         rating: 4,
@@ -83,7 +87,12 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
   }
 
   const handleBookNow = () => {
-    if (!deliveryAddress || !startDate || !endDate || (bookingType === "hour" && (!startHour || !endHour))) {
+    if (
+      !deliveryAddress ||
+      !startDate ||
+      !endDate ||
+      (bookingType === "hour" && (!startHour || !endHour))
+    ) {
       alert("Please fill in all required details.");
       return;
     }
@@ -114,7 +123,8 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
           weight: "500 g",
           cameraQuality: "4K Ultra HD",
           batteryLife: "30 minutes",
-          usefulUses: "Ideal for wedding photography, videography, and live streaming.",
+          usefulUses:
+            "Ideal for wedding photography, videography, and live streaming.",
           additionalSpecs: "GPS, Obstacle Avoidance, 3-Axis Gimbal",
         };
       case "Food Delivery":
@@ -125,7 +135,8 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
           weight: "600 g",
           payloadCapacity: "2 kg",
           batteryLife: "25 minutes",
-          usefulUses: "Perfect for delivering food, groceries, and small packages.",
+          usefulUses:
+            "Perfect for delivering food, groceries, and small packages.",
           additionalSpecs: "Temperature Control, GPS Tracking, Auto Return",
         };
       case "Farming":
@@ -136,8 +147,10 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
           weight: "700 g",
           sprayCapacity: "5 liters",
           batteryLife: "40 minutes",
-          usefulUses: "Great for crop monitoring, pesticide spraying, and soil analysis.",
-          additionalSpecs: "Precision Spraying, Real-Time Data, Weather Resistant",
+          usefulUses:
+            "Great for crop monitoring, pesticide spraying, and soil analysis.",
+          additionalSpecs:
+            "Precision Spraying, Real-Time Data, Weather Resistant",
         };
       default:
         return {
@@ -146,13 +159,25 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
           speed: "25 mph",
           weight: "400 g",
           batteryLife: "20 minutes",
-          usefulUses: "Suitable for general photography, videography, and recreational use.",
+          usefulUses:
+            "Suitable for general photography, videography, and recreational use.",
           additionalSpecs: "Foldable Design, HD Camera, Long Battery Life",
         };
     }
   };
 
-  const { details, controlRange, speed, weight, cameraQuality, payloadCapacity, sprayCapacity, batteryLife, usefulUses, additionalSpecs } = getProductDetails();
+  const {
+    details,
+    controlRange,
+    speed,
+    weight,
+    cameraQuality,
+    payloadCapacity,
+    sprayCapacity,
+    batteryLife,
+    usefulUses,
+    additionalSpecs,
+  } = getProductDetails();
 
   return (
     <div className="">
@@ -167,13 +192,29 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
       </div>
       <h2 className="text-xl font-bold mb-4">{product.name}</h2>
       <img
-                    src={product.image.startsWith('data:image') ? product.image : `${process.env.PUBLIC_URL}/${product.image}`}
-                    alt={product.name}
+        src={
+          product.image.startsWith("data:image")
+            ? product.image
+            : `${process.env.PUBLIC_URL}/${product.image}`
+        }
+        alt={product.name}
         className="w-80 h-50 object-cover mb-2 rounded"
       />
-      {bookingType === "day" && <p className="text-sm text-blue-600 font-bold">${product.pricePerDay} per day</p>}
-      {bookingType === "month" && <p className="text-sm text-blue-600 font-bold">${product.pricePerMonth} per month</p>}
-      {bookingType === "hour" && <p className="text-sm text-blue-600 font-bold">${product.pricePerHour} per hour</p>}
+      {bookingType === "day" && (
+        <p className="text-sm text-blue-600 font-bold">
+          ${product.pricePerDay} per day
+        </p>
+      )}
+      {bookingType === "month" && (
+        <p className="text-sm text-blue-600 font-bold">
+          ${product.pricePerMonth} per month
+        </p>
+      )}
+      {bookingType === "hour" && (
+        <p className="text-sm text-blue-600 font-bold">
+          ${product.pricePerHour} per hour
+        </p>
+      )}
 
       <p className="text-base">{product.description}</p>
       <p className="text-sm text-gray-600">Category: {product.category}</p>
@@ -181,16 +222,28 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
       <p className="text-sm text-gray-600">Control Range: {controlRange}</p>
       <p className="text-sm text-gray-600">Speed: {speed}</p>
       <p className="text-sm text-gray-600">Weight: {weight}</p>
-      {cameraQuality && <p className="text-sm text-gray-600">Camera Quality: {cameraQuality}</p>}
-      {payloadCapacity && <p className="text-sm text-gray-600">Payload Capacity: {payloadCapacity}</p>}
-      {sprayCapacity && <p className="text-sm text-gray-600">Spray Capacity: {sprayCapacity}</p>}
+      {cameraQuality && (
+        <p className="text-sm text-gray-600">Camera Quality: {cameraQuality}</p>
+      )}
+      {payloadCapacity && (
+        <p className="text-sm text-gray-600">
+          Payload Capacity: {payloadCapacity}
+        </p>
+      )}
+      {sprayCapacity && (
+        <p className="text-sm text-gray-600">Spray Capacity: {sprayCapacity}</p>
+      )}
       <p className="text-sm text-gray-600">Battery Life: {batteryLife}</p>
       <p className="text-base mt-4">{details}</p>
       <p className="text-base mt-4">Useful Uses: {usefulUses}</p>
-      <p className="text-base mt-4">Additional Specifications: {additionalSpecs}</p>
+      <p className="text-base mt-4">
+        Additional Specifications: {additionalSpecs}
+      </p>
 
       <div className="mt-4">
-        <label className="block text-sm font-bold mb-2">Delivery Address:</label>
+        <label className="block text-sm font-bold mb-2">
+          Delivery Address:
+        </label>
         <input
           type="text"
           value={deliveryAddress}
@@ -213,7 +266,9 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
       </div>
 
       <div className="mt-4">
-        <label className="block text-sm font-bold mb-2">Booking Duration:</label>
+        <label className="block text-sm font-bold mb-2">
+          Booking Duration:
+        </label>
         <input
           type="number"
           value={bookingDuration}
@@ -294,37 +349,35 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
 
       <div className="mt-8">
         <h3 className="text-lg font-bold mb-4">Ratings & Reviews</h3>
-        {product.reviews && product.reviews.length > 0 ? (
-          product.reviews.map((review, index) => (
-            <div key={index} className="border p-4 rounded-lg mb-4">
-              <p className="text-sm font-bold">{review.user}</p>
-              <p className="flex items-center">
-                {[...Array(review.rating)].map((_, i) => (
-                  <FaStar key={i} className="text-yellow-500" />
-                ))}
-                {[...Array(5 - review.rating)].map((_, i) => (
-                  <FaStar key={i} className="text-gray-400" />
-                ))}
-              </p>
-              <p className="text-sm">{review.comment}</p>
-            </div>
-          ))
-        ) : (
-          reviews[product.category]?.map((review, index) => (
-            <div key={index} className="border p-4 rounded-lg mb-4">
-              <p className="text-sm font-bold">{review.user}</p>
-              <p className="flex items-center">
-                {[...Array(review.rating)].map((_, i) => (
-                  <FaStar key={i} className="text-yellow-500" />
-                ))}
-                {[...Array(5 - review.rating)].map((_, i) => (
-                  <FaStar key={i} className="text-gray-400" />
-                ))}
-              </p>
-              <p className="text-sm">{review.comment}</p>
-            </div>
-          ))
-        )}
+        {product.reviews && product.reviews.length > 0
+          ? product.reviews.map((review, index) => (
+              <div key={index} className="border p-4 rounded-lg mb-4">
+                <p className="text-sm font-bold">{review.user}</p>
+                <p className="flex items-center">
+                  {[...Array(review.rating)].map((_, i) => (
+                    <FaStar key={i} className="text-yellow-500" />
+                  ))}
+                  {[...Array(5 - review.rating)].map((_, i) => (
+                    <FaStar key={i} className="text-gray-400" />
+                  ))}
+                </p>
+                <p className="text-sm">{review.comment}</p>
+              </div>
+            ))
+          : reviews[product.category]?.map((review, index) => (
+              <div key={index} className="border p-4 rounded-lg mb-4">
+                <p className="text-sm font-bold">{review.user}</p>
+                <p className="flex items-center">
+                  {[...Array(review.rating)].map((_, i) => (
+                    <FaStar key={i} className="text-yellow-500" />
+                  ))}
+                  {[...Array(5 - review.rating)].map((_, i) => (
+                    <FaStar key={i} className="text-gray-400" />
+                  ))}
+                </p>
+                <p className="text-sm">{review.comment}</p>
+              </div>
+            ))}
       </div>
     </div>
   );
