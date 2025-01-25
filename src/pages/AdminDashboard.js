@@ -57,6 +57,53 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
     }
   };
 
+  // const handleAddProduct = (e) => {
+  //   e.preventDefault();
+  //   if (editingProduct) {
+  //     // Update existing product
+  //     const updatedProducts = products.map((product) =>
+  //       product.id === editingProduct.id ? { ...product, ...formData } : product
+  //     );
+  //     setProducts(updatedProducts);
+  //     setEditingProduct(null);
+  //     alert("Product updated successfully!");
+  //   } else {
+  //     // Add new product
+  //     const newProduct = {
+  //       id: Date.now(),
+  //       ...formData,
+  //       addedBy: currentAdmin,
+  //     };
+  //     const updatedProducts = [...products, newProduct].sort((a, b) =>
+  //       a.category.localeCompare(b.category)
+  //     );
+  //     setProducts(updatedProducts);
+  //     alert("Product added successfully!");
+  //   }
+  //   // Reset form
+  //   setFormData({
+  //     name: "",
+  //     model: "",
+  //     pricePerHour: "",
+  //     pricePerDay: "",
+  //     pricePerMonth: "",
+  //     controlRange: "",
+  //     type: "",
+  //     speed: "",
+  //     weight: "",
+  //     cameraQuality: "",
+  //     payloadCapacity: "",
+  //     sprayCapacity: "",
+  //     batteryLife: "",
+  //     usefulUses: "",
+  //     additionalSpecs: "",
+  //     description: "",
+  //     category: "",
+  //     image: "",
+  //   });
+  //   setImagePreview(null);
+  //   imageInputRef.current.value = null;
+  // };
   const handleAddProduct = (e) => {
     e.preventDefault();
     if (editingProduct) {
@@ -68,18 +115,24 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
       setEditingProduct(null);
       alert("Product updated successfully!");
     } else {
-      // Add new product
+      // Add new product in the middle
       const newProduct = {
         id: Date.now(),
         ...formData,
         addedBy: currentAdmin,
       };
-      const updatedProducts = [...products, newProduct].sort((a, b) =>
-        a.category.localeCompare(b.category)
-      );
+  
+      const middleIndex = Math.floor(products.length / 2);
+      const updatedProducts = [
+        ...products.slice(0, middleIndex),
+        newProduct,
+        ...products.slice(middleIndex),
+      ].sort((a, b) => a.category.localeCompare(b.category));
+  
       setProducts(updatedProducts);
       alert("Product added successfully!");
     }
+  
     // Reset form
     setFormData({
       name: "",
@@ -104,6 +157,7 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
     setImagePreview(null);
     imageInputRef.current.value = null;
   };
+  
 
   const handleEditProduct = (product) => {
     setEditingProduct(product);
@@ -132,11 +186,11 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
     : products;
 
   return (
-    <div>
+    <div >
       <h2 className="text-xl font-bold mb-4">
         {editingProduct ? "Edit Product" : "Add New Product"}
       </h2>
-      <form onSubmit={handleAddProduct} className="space-y-4" ref={formRef}>
+      <form onSubmit={handleAddProduct} className="p-4 max-w-md mx-auto space-y-4" ref={formRef}>
         <input
           type="text"
           name="name"
@@ -219,6 +273,7 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
         >
           {editingProduct ? "Update Product" : "Add Product"}
         </button>
+        
       </form>
       <div className="flex justify-between items-center mt-8 mb-4">
         <h2 className="text-xl font-bold">Available Products</h2>
