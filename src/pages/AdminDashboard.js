@@ -291,6 +291,3 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
 };
 
 export default AdminDashboard;
-
-
-
