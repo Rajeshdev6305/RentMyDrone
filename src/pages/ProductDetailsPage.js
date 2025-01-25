@@ -190,7 +190,7 @@ const ProductDetailsPage = ({
           <span>Back</span>
         </button>
       </div>
-      <h2 className="text-xl font-bold mb-4">{product.name}</h2>
+      <h2 className="text-xl font-bold mb-4" >{product.name}</h2>
       <img
         src={
           product.image.startsWith("data:image")

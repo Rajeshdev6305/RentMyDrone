@@ -132,8 +132,8 @@ const UserDashboard = ({
               .filter((product) => product.category === category)
               .map((product) => (
                 <div
-                  key={product.id}
-                  className="border p-4 shadow hover:shadow-lg rounded-lg transition cursor-pointer"
+                key={product.id}
+                className="border p-4 shadow rounded-lg transition hover:shadow-lg hover:scale-105 cursor-pointer"
                   onClick={() => handleViewDetails(product)}
                 >
                   <img
