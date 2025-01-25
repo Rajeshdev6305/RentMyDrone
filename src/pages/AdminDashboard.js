@@ -243,9 +243,11 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
               .filter((product) => filteredProducts.includes(product))
               .map((product) => (
                 <div
+                id={`product-${product.id}`}
                 key={product.id}
                 className="border p-4 shadow rounded-lg transition hover:shadow-lg hover:scale-105 cursor-pointer"
-                >
+              >
+              
                   <img
                     src={
                       product.image.startsWith("data:image")

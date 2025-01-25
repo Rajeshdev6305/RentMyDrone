@@ -66,11 +66,28 @@ const Header = ({
     }
   };
 
+  // const handleSuggestionClick = (product) => {
+  //   navigate(`/product/${product.id}`, { state: { product } });
+  //   setSuggestions([]);
+  //   setMenuOpen(false);
+  // };
   const handleSuggestionClick = (product) => {
+  if (userType === "admin") {
+    // Find the product element in the DOM
+    const productElement = document.getElementById(`product-${product.id}`);
+    if (productElement) {
+      productElement.scrollIntoView({ behavior: "smooth" });
+    } else {
+      console.log("Product element not found");
+    }
+  } else {
+    // Navigate to the product details page for non-admin users
     navigate(`/product/${product.id}`, { state: { product } });
-    setSuggestions([]);
-    setMenuOpen(false);
-  };
+  }
+  setSuggestions([]);
+  setMenuOpen(false);
+};
+
 
   const scrollToSection = (sectionId) => {
     const section = document.getElementById(sectionId);
