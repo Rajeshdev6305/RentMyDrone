@@ -22,10 +22,10 @@
     "webpack": "^5.97.1"
   },
   "scripts": {
-    "predeploy": "npm run build",
+    "predeploy": "set NODE_OPTIONS=--max-old-space-size=4096  react-scripts build",
     "deploy": "gh-pages -d build",
     "start": "react-scripts start",
-    "build": "set NODE_OPTIONS=--openssl-legacy-provider && react-scripts build",
+    "build": "NODE_OPTIONS=--max-old-space-size=4096 react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
