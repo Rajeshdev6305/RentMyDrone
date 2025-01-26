@@ -125,8 +125,7 @@ const MainBody = ({
         {filteredProducts.map((product) => (
           <div
             key={product.id}
-            className="border p-4 shadow hover:shadow-lg rounded-lg transition"
-          >
+            className="border p-4 shadow rounded-lg transition hover:shadow-lg hover:scale-105 cursor-pointer"          >
             <img
               src={
                 product.image.startsWith("data:image")
