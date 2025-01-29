@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
 
 const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
@@ -26,18 +25,15 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
   const [imagePreview, setImagePreview] = useState(null);
   const [editingProduct, setEditingProduct] = useState(null);
   const [viewMyProducts, setViewMyProducts] = useState(false);
-  const navigate = useNavigate();
   const imageInputRef = useRef(null);
   const formRef = useRef(null);
 
   useEffect(() => {
-    // Load products from localStorage
     const storedProducts = JSON.parse(localStorage.getItem("products")) || [];
     setProducts(storedProducts);
   }, [setProducts]);
 
   useEffect(() => {
-    // Persist products to localStorage whenever they are updated
     localStorage.setItem("products", JSON.stringify(products));
   }, [products]);
 
@@ -60,7 +56,6 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
   const handleAddProduct = (e) => {
     e.preventDefault();
     if (editingProduct) {
-      // Update existing product
       const updatedProducts = products.map((product) =>
         product.id === editingProduct.id ? { ...product, ...formData } : product
       );
@@ -68,7 +63,6 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
       setEditingProduct(null);
       alert("Product updated successfully!");
     } else {
-      // Add new product
       const newProduct = {
         id: Date.now(),
         ...formData,
@@ -80,7 +74,6 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
       setProducts(updatedProducts);
       alert("Product added successfully!");
     }
-    // Reset form
     setFormData({
       name: "",
       model: "",
@@ -104,8 +97,6 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
     setImagePreview(null);
     imageInputRef.current.value = null;
   };
-  
-  
 
   const handleEditProduct = (product) => {
     setEditingProduct(product);
@@ -126,7 +117,8 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
     if (!acc[product.category]) {
       acc[product.category] = [];
     }
-    acc[product.category].push(product);  return acc;
+    acc[product.category].push(product);
+    return acc;
   }, {});
 
   const filteredProducts = viewMyProducts
@@ -134,96 +126,108 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
     : products;
 
   return (
-    <div >
+    <div>
       <h2 className="text-xl font-bold mb-4">
         {editingProduct ? "Edit Product" : "Add New Product"}
       </h2>
-      <form onSubmit={handleAddProduct} className="p-4 max-w-md mx-auto space-y-4" ref={formRef}>
-        <input
-          type="text"
-          name="name"
-          placeholder="Product Name"
-          value={formData.name}
-          onChange={handleChange}
-          className="w-full p-2 border"
-          required
-        />
-        <input
-          type="text"
-          name="model"
-          placeholder="Model"
-          value={formData.model}
-          onChange={handleChange}
-          className="w-full p-2 border"
-          required
-        />
-        <input
-          type="number"
-          name="pricePerHour"
-          placeholder="Price Per Hour"
-          value={formData.pricePerHour}
-          onChange={handleChange}
-          className="w-full p-2 border"
-          required
-        />
-        <input
-          type="number"
-          name="pricePerDay"
-          placeholder="Price Per Day"
-          value={formData.pricePerDay}
-          onChange={handleChange}
-          className="w-full p-2 border"
-          required
-        />
-         <input
-          type="number"
-          name="pricePerMonth"
-          placeholder="Price Per Month"
-          value={formData.pricePerMonth}
-          onChange={handleChange}
-          className="w-full p-2 border"
-          required
-        />
-        <textarea
-          name="description"
-          placeholder="Description"
-          value={formData.description}
-          onChange={handleChange}
-          className="w-full p-2 border"
-          required
-        />
-        <input
-          type="text"
-          name="category"
-          placeholder="Category"
-          value={formData.category}
-          onChange={handleChange}
-          className="w-full p-2 border"
-          required
-        />
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageChange}
-          ref={imageInputRef}
-          className="w-full p-2 border"
-        />
-        {imagePreview && (
-          <img
-            src={imagePreview}
-            alt="Preview"
-            className="w-80 h-100 object-cover mb-2 rounded"
+      <form
+        onSubmit={handleAddProduct}
+        className="flex gap-6 p-4 max-w-screen-md mx-auto space-y-4"
+        ref={formRef}
+      >
+        {/* Image Section on the Left */}
+        <div className="w-1/2 hover:scale-105 transition-all">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            ref={imageInputRef}
+            className="w-full p-2 border"
           />
-        )}
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white px-2 py-1 text-sm rounded"
-        >
-          {editingProduct ? "Update Product" : "Add Product"}
-        </button>
-        
+          {imagePreview && (
+            <img
+              src={imagePreview}
+              alt="Preview"
+              className="w-full h-80 object-cover mt-2 rounded-lg"
+            />
+          )}
+        </div>
+
+        {/* Form Section on the Right */}
+        <div className="w-1/2 hover:scale-105 transition-all">
+          <input
+            type="text"
+            name="name"
+            placeholder="Product Name"
+            value={formData.name}
+            onChange={handleChange}
+            className="w-full p-2 border mb-4"
+            required
+          />
+          <input
+            type="text"
+            name="model"
+            placeholder="Model"
+            value={formData.model}
+            onChange={handleChange}
+            className="w-full p-2 border mb-4"
+            required
+          />
+          <input
+            type="number"
+            name="pricePerHour"
+            placeholder="Price Per Hour"
+            value={formData.pricePerHour}
+            onChange={handleChange}
+            className="w-full p-2 border mb-4"
+            required
+          />
+          <input
+            type="number"
+            name="pricePerDay"
+            placeholder="Price Per Day"
+            value={formData.pricePerDay}
+            onChange={handleChange}
+            className="w-full p-2 border mb-4"
+            required
+          />
+          <input
+            type="number"
+            name="pricePerMonth"
+            placeholder="Price Per Month"
+            value={formData.pricePerMonth}
+            onChange={handleChange}
+            className="w-full p-2 border mb-4"
+            required
+          />
+          <textarea
+            name="description"
+            placeholder="Description"
+            value={formData.description}
+            onChange={handleChange}
+            className="w-full p-2 border mb-4"
+            required
+          />
+          <input
+            type="text"
+            name="category"
+            placeholder="Category"
+            value={formData.category}
+            onChange={handleChange}
+            className="w-full p-2 border mb-4"
+            required
+          />
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white px-2 py-1 text-sm rounded"
+          >
+            {editingProduct ? "Update Product" : "Add Product"}
+          </button>
+        </div>
       </form>
-      <div className="flex justify-between items-center mt-8 mb-4 ">
+
+      {/* Available Products Section */}
+      <div className="flex justify-between items-center mt-8 mb-4">
         <h2 className="text-xl font-bold">Available Products</h2>
         <button
           onClick={() => setViewMyProducts(!viewMyProducts)}
@@ -243,11 +247,9 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
               .filter((product) => filteredProducts.includes(product))
               .map((product) => (
                 <div
-                id={`product-${product.id}`}
-                key={product.id}
-                className="border p-4 shadow rounded-lg transition hover:shadow-lg hover:scale-105 cursor-pointer"
-              >
-              
+                  key={product.id}
+                  className="border p-4 shadow rounded-lg transition hover:shadow-lg hover:scale-105 cursor-pointer"
+                >
                   <img
                     src={
                       product.image.startsWith("data:image")

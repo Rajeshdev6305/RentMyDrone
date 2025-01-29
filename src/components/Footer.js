@@ -1,7 +1,12 @@
 import React from "react";
-import { FaInfoCircle, FaServicestack, FaEnvelope, FaStar } from "react-icons/fa";
+import { FaInfoCircle, FaServicestack, FaEnvelope, FaStar, FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa";
 
 const Footer = () => {
+  // Function to prevent page reload on social media icon click
+  const handleSocialMediaClick = (e) => {
+    e.preventDefault();
+  };
+
   return (
     <footer className="bg-gray-800 text-white p-4">
       <div className="container mx-auto">
@@ -25,14 +30,13 @@ const Footer = () => {
               <FaServicestack />
               <span>Our Services</span>
             </h4>
-            <ul className="list-disc list-inside">
+            <ul className="list-none list-inside">
               <li>Drone Delivery: Fast and reliable delivery of packages, food, and other items using our advanced drone fleet.</li>
               <li>Real-Time Tracking: Monitor your drone's location and status in real-time through our user-friendly app.</li>
               <li>Customizable Solutions: Tailor our drone services to meet your specific needs, whether for events, agriculture, or logistics.</li>
-              <li>Rental Services: Rent high-quality drones for various purposes, including photography, videography, and surveying.</li>
-              <li>Maintenance and Support: Comprehensive maintenance and support services to ensure your drones are always in top condition.</li>
             </ul>
           </div>
+
           {/* Contact Details */}
           <div id="contact-us" className="text-sm md:text-base">
             <h4 className="font-bold text-lg mb-2 flex items-center space-x-2">
@@ -44,6 +48,23 @@ const Footer = () => {
             <p>Address: 123 Drone Street, City, Country</p>
           </div>
         </div>
+
+        {/* Social Media Links */}
+        <div className="mt-8 flex justify-center space-x-6">
+          <a href="facebook.com" onClick={handleSocialMediaClick} className="text-blue-600 text-2xl hover:text-blue-800 transition-colors duration-300">
+            <FaFacebook />
+          </a>
+          <a href="twitter.com" onClick={handleSocialMediaClick} className="text-blue-400 text-2xl hover:text-blue-500 transition-colors duration-300">
+            <FaTwitter />
+          </a>
+          <a href="instagram.com" onClick={handleSocialMediaClick} className="text-pink-600 text-2xl hover:text-pink-700 transition-colors duration-300">
+            <FaInstagram />
+          </a>
+          <a href="linkedin.com" onClick={handleSocialMediaClick} className="text-blue-700 text-2xl hover:text-blue-800 transition-colors duration-300">
+            <FaLinkedin />
+          </a>
+        </div>
+
         {/* Example Reviews */}
         <div className="mt-8">
           <h4 className="font-bold text-lg mb-2 flex items-center space-x-2">

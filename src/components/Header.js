@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import {
   FaHome,
   FaInfoCircle,
-  FaServicestack,
-  FaEnvelope,
   FaSignInAlt,
   FaUserPlus,
   FaShoppingCart,
@@ -12,7 +10,6 @@ import {
   FaProductHunt,
   FaBars,
   FaTimes,
-  FaUserCircle,
 } from "react-icons/fa";
 import { auth } from "../Authentication/firebaseConfig";
 
@@ -28,8 +25,8 @@ const Header = ({
   const [cartCount, setCartCount] = useState(0);
   const [suggestions, setSuggestions] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [userDetails, setUserDetails] = useState({});
+  const [activeSection, setActiveSection] = useState(""); // To track the active section
 
   useEffect(() => {
     setCartCount(cartItems.reduce((acc, item) => acc + item.quantity, 0));
@@ -66,57 +63,42 @@ const Header = ({
     }
   };
 
-  // const handleSuggestionClick = (product) => {
-  //   navigate(`/product/${product.id}`, { state: { product } });
-  //   setSuggestions([]);
-  //   setMenuOpen(false);
-  // };
   const handleSuggestionClick = (product) => {
-  if (userType === "admin") {
-    // Find the product element in the DOM
-    const productElement = document.getElementById(`product-${product.id}`);
-    if (productElement) {
-      productElement.scrollIntoView({ behavior: "smooth" });
+    if (userType === "admin") {
+      const productElement = document.getElementById(`product-${product.id}`);
+      if (productElement) {
+        productElement.scrollIntoView({ behavior: "smooth" });
+      } else {
+        console.log("Product element not found");
+      }
     } else {
-      console.log("Product element not found");
+      navigate(`/product/${product.id}`, { state: { product } });
     }
-  } else {
-    // Navigate to the product details page for non-admin users
-    navigate(`/product/${product.id}`, { state: { product } });
-  }
-  setSuggestions([]);
-  setMenuOpen(false);
-};
-
+    setSuggestions([]);
+    setMenuOpen(false);
+  };
 
   const scrollToSection = (sectionId) => {
     const section = document.getElementById(sectionId);
     section.scrollIntoView({ behavior: "smooth" });
     setMenuOpen(false);
-  };
-
-  const scrollToAddProductForm = () => {
-    const formSection = document.getElementById("add-product-form");
-    if (formSection) {
-      formSection.scrollIntoView({ behavior: "smooth" });
-      console.log("Scrolling to Add Product form");
-    } else {
-      console.log("Add Product form not found");
-    }
+    setActiveSection(sectionId); // Set the active section
   };
 
   const handleProductClick = () => {
     if (userType === "admin") {
-      console.log("Admin clicked Add Product");
-      scrollToAddProductForm(); // Scroll to Add Product form for admin
+      const formSection = document.getElementById("add-product-form");
+      if (formSection) {
+        formSection.scrollIntoView({ behavior: "smooth" });
+      }
     } else {
-      navigate("/user-dashboard"); // Navigate to user dashboard for regular users
+      navigate("/user-dashboard");
     }
     setMenuOpen(false);
   };
 
   const handleCartClick = () => {
-    navigate("/cart"); // Navigate to cart page
+    navigate("/cart");
     setMenuOpen(false);
   };
 
@@ -124,13 +106,19 @@ const Header = ({
     setMenuOpen(!menuOpen);
   };
 
-  const toggleProfileMenu = () => {
-    setProfileMenuOpen(!profileMenuOpen);
-  };
-
   return (
-    <header className="bg-gray-800 text-white p-4 flex justify-between items-center shadow-lg fixed top-0 left-0 w-full z-50">
-      {!menuOpen && <h1 className="text-xl font-bold">Drone Delivery</h1>}
+    <header className="bg-gray-800 bo text-white p-4 flex justify-between items-center shadow-lg fixed top-0 left-0 w-full z-50">
+      {/* Logo and Title */}
+      <div className="flex items-center">
+        <img
+            src="https://img.freepik.com/premium-photo/delivery-drone-online-delivery-concept-sydney-opera-house-ai-generated_599862-1237.jpg"
+            alt="Logo"
+            className="h-12 w-12 mr-2 rounded-full object-cover"
+        />
+        {!menuOpen && <h1 className="text-xl font-bold">Drone Delivery Service</h1>}
+      </div>
+
+      {/* Search Bar (Only for Logged-in Users) */}
       {isLoggedIn && (
         <div className={`relative flex-1 mx-4 ${menuOpen ? "hidden" : "flex"}`}>
           <input
@@ -154,112 +142,82 @@ const Header = ({
           )}
         </div>
       )}
+
+      {/* Mobile Menu Toggle */}
       <button onClick={toggleMenu} className="md:hidden absolute top-4 right-4">
         {menuOpen ? <FaTimes /> : <FaBars />}
       </button>
-      <nav
-        className={`flex-col md:flex-row md:flex items-center space-x-4 ${
-          menuOpen ? "flex" : "hidden"
-        } md:flex`}
-      >
-        <div
-          className={`flex-col md:flex-row md:flex items-center space-x-4 ${
-            menuOpen ? "flex" : "hidden"
-          } md:flex md:mr-auto`}
-        >
-          {!isLoggedIn && (
-            <button
-              onClick={() => {
-                navigate("/");
-                setMenuOpen(false);
-              }}
-              className="text-white px-2 py-1 text-sm hover:text-gray-300 transition flex items-center space-x-2 mb-2 md:mb-0"
+
+      {/* Navigation */}
+      <nav className={`flex-col md:flex-row md:flex items-center space-x-4 ${menuOpen ? "flex" : "hidden"} md:flex`}>
+        {/* Links */}
+        {!isLoggedIn && (
+          <button
+            onClick={() => navigate("/")}
+            className="text-white flex items-center space-x-2 px-2 py-1 text-sm hover:text-gray-300"
             >
-              <FaHome />
-              <span>Home</span>
-            </button>
-          )}
-          {isLoggedIn && (
-            <>
-              <button
-                onClick={handleProductClick}
-                className="text-white px-2 py-1 text-sm hover:text-gray-300 transition flex items-center space-x-2 mb-2 md:mb-0"
-              >
-                <FaProductHunt />
-                <span>{userType === "admin" ? "Add Product" : "Products"}</span>
-              </button>
-            </>
-          )}
-          {!isLoggedIn && (
-            <>
-              <button
-                onClick={() => {
-                  navigate("/login");
-                  setMenuOpen(false);
-                }}
-                className="text-white px-2 py-1 text-sm hover:text-gray-300 transition flex items-center space-x-2 mb-2 md:mb-0"
-              >
-                <FaSignInAlt />
-                <span>Login</span>
-              </button>
-              <button
-                onClick={() => {
-                  navigate("/signup");
-                  setMenuOpen(false);
-                }}
-                className="text-white px-2 py-1 text-sm hover:text-gray-300 transition flex items-center space-x-2 mb-2 md:mb-0"
-              >
-                <FaUserPlus />
-                <span>Sign Up</span>
-              </button>
-            </>
-          )}
-          <button
-            onClick={() => scrollToSection("about-us")}
-            className="text-white px-2 py-1 text-sm hover:text-gray-300 transition flex items-center space-x-2 mb-2 md:mb-0"
-          >
-            <FaInfoCircle />
-            <span>About Us</span>
+            <FaHome />
+            <span>Home</span>
           </button>
+        )}
+        {isLoggedIn && userType !== "admin" && (
           <button
-            onClick={() => scrollToSection("services")}
-            className="text-white px-2 py-1 text-sm hover:text-gray-300 transition flex items-center space-x-2 mb-2 md:mb-0"
-          >
-            <FaServicestack />
-            <span>Services</span>
-          </button>
-          <button
-            onClick={() => scrollToSection("contact-us")}
-            className="text-white px-2 py-1 text-sm hover:text-gray-300 transition flex items-center space-x-2 mb-2 md:mb-0"
-          >
-            <FaEnvelope />
-            <span>Contact Us</span>
-          </button>
-          {isLoggedIn && userType !== "admin" && (
-            <button
-              onClick={handleCartClick}
-              className="text-white px-2 py-1 text-sm hover:text-gray-300 transition flex items-center space-x-2 mb-2 md:mb-0"
+            onClick={handleProductClick}
+            className="text-white flex items-center space-x-2 px-2 py-1 text-sm hover:text-gray-300"
             >
-              <FaShoppingCart />
-              <span>Cart</span>
-              {cartCount > 0 && (
-                <span className="bg-red-600 text-white rounded-full px-2 py-1 text-xs ml-2">
-                  {cartCount}
-                </span>
-              )}
+            <FaProductHunt />
+            <span>Products</span>
+          </button>
+        )}
+        {!isLoggedIn && (
+          <>
+            <button
+              onClick={() => navigate("/login")}
+              className="text-white flex items-center space-x-2 px-2 py-1 text-sm hover:text-gray-300"
+              >
+              <FaSignInAlt />
+              <span>Login</span>
             </button>
-          )}
-        </div>
+            <button
+              onClick={() => navigate("/signup")}
+              className="text-white flex items-center space-x-2 px-2 py-1 text-sm hover:text-gray-300"
+              >
+              <FaUserPlus />
+              <span>Sign Up</span>
+            </button>
+          </>
+        )}
+        <button
+          onClick={() => scrollToSection("about-us")}
+          className="text-white flex items-center space-x-2 px-2 py-1 text-sm hover:text-gray-300"
+          >
+           
+          <FaInfoCircle />
+          <span>About Us</span>
+        </button>
+
+        {isLoggedIn && userType !== "admin" && (
+          <button
+            onClick={handleCartClick}
+            className="text-white flex items-center space-x-2 px-2 py-1 text-sm hover:text-gray-300"
+            >
+            <FaShoppingCart />
+            <span>Cart</span>
+            {cartCount > 0 && (
+              <span className="bg-red-600 flex items-center space-x-2 text-white rounded-full px-2 py-1 text-xs ml-2">
+                {cartCount}
+              </span>
+            )}
+          </button>
+        )}
         {isLoggedIn && (
-          <div className="relative">
-            <button
-              onClick={handleLogout}
-              className="bg-red-600 text-white px-2 py-1 text-sm rounded hover:bg-red-700 transition flex items-center space-x-2"
-            >
-              <FaSignOutAlt />
-              <span>Logout</span>
-            </button>
-          </div>
+          <button
+            onClick={handleLogout}
+            className="bg-red-600 flex items-center space-x-2  text-white px-2 py-1 text-sm rounded hover:bg-red-700"
+          >
+            <FaSignOutAlt />
+            <span>Logout</span>
+          </button>
         )}
       </nav>
     </header>

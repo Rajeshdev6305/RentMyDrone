@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { FaArrowLeft, FaCartPlus, FaCalendarAlt, FaStar } from "react-icons/fa";
+import { FaArrowLeft, FaCartPlus, FaStar } from "react-icons/fa";
 
-const ProductDetailsPage = ({
-  products = [],
-  setCartItems,
-  cartItems = [],
-}) => {
+const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => {
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -20,45 +16,6 @@ const ProductDetailsPage = ({
   const [startHour, setStartHour] = useState(""); // New state for start hour
   const [endHour, setEndHour] = useState(""); // New state for end hour
   const [product, setProduct] = useState(null);
-
-  const reviews = {
-    Marriage: [
-      {
-        user: "John Doe",
-        rating: 4,
-        comment: "Great for wedding photography. Captured amazing shots!",
-      },
-      {
-        user: "Jane Smith",
-        rating: 5,
-        comment: "Perfect for our wedding event. Highly recommend!",
-      },
-    ],
-    "Food Delivery": [
-      {
-        user: "Alice Johnson",
-        rating: 4,
-        comment: "Efficient and reliable for food delivery.",
-      },
-      {
-        user: "Bob Brown",
-        rating: 5,
-        comment: "Kept the food warm and delivered on time.",
-      },
-    ],
-    Farming: [
-      {
-        user: "Charlie Davis",
-        rating: 4,
-        comment: "Great for crop monitoring and spraying.",
-      },
-      {
-        user: "Dana White",
-        rating: 5,
-        comment: "Made our farming operations more efficient.",
-      },
-    ],
-  };
 
   useEffect(() => {
     const prod =
@@ -107,8 +64,8 @@ const ProductDetailsPage = ({
         deliveryAddress,
         startDate,
         endDate,
-        startHour: bookingType === "hour" ? startHour : null, // Include start hour in the state if booking type is hour
-        endHour: bookingType === "hour" ? endHour : null, // Include end hour in the state if booking type is hour
+        startHour: bookingType === "hour" ? startHour : null,
+        endHour: bookingType === "hour" ? endHour : null,
       },
     });
   };
@@ -180,70 +137,77 @@ const ProductDetailsPage = ({
   } = getProductDetails();
 
   return (
-    <div className="">
+    <div className="max-w-screen-lg mx-auto p-4 space-y-6">
       <div className="flex justify-between items-center mb-4">
         <button
           onClick={() => navigate(-1)}
-          className="bg-gray-600 text-white px-4 py-2 rounded mb-4 flex items-center space-x-2"
+          className="bg-gray-600 text-white px-4 py-2 rounded flex items-center space-x-2"
         >
           <FaArrowLeft />
           <span>Back</span>
         </button>
       </div>
-      <h2 className="text-xl font-bold mb-4" >{product.name}</h2>
-      <img
-        src={
-          product.image.startsWith("data:image")
-            ? product.image
-            : `${process.env.PUBLIC_URL}/${product.image}`
-        }
-        alt={product.name}
-        className="w-80 h-50 object-cover mb-2 rounded"
-      />
-      {bookingType === "day" && (
-        <p className="text-sm text-blue-600 font-bold">
-          ${product.pricePerDay} per day
-        </p>
-      )}
-      {bookingType === "month" && (
-        <p className="text-sm text-blue-600 font-bold">
-          ${product.pricePerMonth} per month
-        </p>
-      )}
-      {bookingType === "hour" && (
-        <p className="text-sm text-blue-600 font-bold">
-          ${product.pricePerHour} per hour
-        </p>
-      )}
 
-      <p className="text-base">{product.description}</p>
-      <p className="text-sm text-gray-600">Category: {product.category}</p>
-      <p className="text-sm text-gray-600">Model: {product.model}</p>
-      <p className="text-sm text-gray-600">Control Range: {controlRange}</p>
-      <p className="text-sm text-gray-600">Speed: {speed}</p>
-      <p className="text-sm text-gray-600">Weight: {weight}</p>
-      {cameraQuality && (
-        <p className="text-sm text-gray-600">Camera Quality: {cameraQuality}</p>
-      )}
-      {payloadCapacity && (
-        <p className="text-sm text-gray-600">
-          Payload Capacity: {payloadCapacity}
-        </p>
-      )}
-      {sprayCapacity && (
-        <p className="text-sm text-gray-600">Spray Capacity: {sprayCapacity}</p>
-      )}
-      <p className="text-sm text-gray-600">Battery Life: {batteryLife}</p>
-      <p className="text-base mt-4">{details}</p>
-      <p className="text-base mt-4">Useful Uses: {usefulUses}</p>
-      <p className="text-base mt-4">
-        Additional Specifications: {additionalSpecs}
-      </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <img
+            src={
+              product.image.startsWith("data:image")
+                ? product.image
+                : `${process.env.PUBLIC_URL}/${product.image}`
+            }
+            alt={product.name}
+            className="w-full h-auto object-cover rounded-lg shadow-lg"
+          />
+        </div>
 
-      <div className="mt-4">
-        <label className="block text-sm font-bold mb-2">
-          Delivery Address:
-        </label>
+        <div>
+          <h2 className="text-2xl font-bold mb-4">{product.name}</h2>
+
+          <div className="flex items-center mb-2">
+            {bookingType === "day" && (
+              <p className="text-sm text-blue-600 font-bold">
+                ${product.pricePerDay} per day
+              </p>
+            )}
+            {bookingType === "month" && (
+              <p className="text-sm text-blue-600 font-bold">
+                ${product.pricePerMonth} per month
+              </p>
+            )}
+            {bookingType === "hour" && (
+              <p className="text-sm text-blue-600 font-bold">
+                ${product.pricePerHour} per hour
+              </p>
+            )}
+          </div>
+
+          <p className="text-base mb-2">{product.description}</p>
+          <p className="text-sm text-gray-600">Category: {product.category}</p>
+          <p className="text-sm text-gray-600">Model: {product.model}</p>
+          <p className="text-sm text-gray-600">Control Range: {controlRange}</p>
+          <p className="text-sm text-gray-600">Speed: {speed}</p>
+          <p className="text-sm text-gray-600">Weight: {weight}</p>
+          {cameraQuality && (
+            <p className="text-sm text-gray-600">Camera Quality: {cameraQuality}</p>
+          )}
+          {payloadCapacity && (
+            <p className="text-sm text-gray-600">
+              Payload Capacity: {payloadCapacity}
+            </p>
+          )}
+          {sprayCapacity && (
+            <p className="text-sm text-gray-600">Spray Capacity: {sprayCapacity}</p>
+          )}
+          <p className="text-sm text-gray-600">Battery Life: {batteryLife}</p>
+          <p className="text-base mt-4">{details}</p>
+          <p className="text-base mt-4">Useful Uses: {usefulUses}</p>
+          <p className="text-base mt-4">Additional Specifications: {additionalSpecs}</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <label className="block text-sm font-bold mb-2">Delivery Address:</label>
         <input
           type="text"
           value={deliveryAddress}
@@ -252,24 +216,21 @@ const ProductDetailsPage = ({
         />
       </div>
 
-      <div className="mt-4">
+      <div className="space-y-4">
         <label className="block text-sm font-bold mb-2">Booking Type:</label>
         <select
           value={bookingType}
           onChange={(e) => setBookingType(e.target.value)}
           className="w-full p-2 border rounded"
         >
-
           <option value="hour">Hour</option>
           <option value="day">Day</option>
           <option value="month">Month</option>
         </select>
       </div>
 
-      <div className="mt-4">
-        <label className="block text-sm font-bold mb-2">
-          Booking Duration:
-        </label>
+      <div className="space-y-4">
+        <label className="block text-sm font-bold mb-2">Booking Duration:</label>
         <input
           type="number"
           value={bookingDuration}
@@ -279,7 +240,7 @@ const ProductDetailsPage = ({
         />
       </div>
 
-      <div className="mt-4">
+      <div className="space-y-4">
         <label className="block text-sm font-bold mb-2">Quantity:</label>
         <input
           type="number"
@@ -290,7 +251,7 @@ const ProductDetailsPage = ({
         />
       </div>
 
-      <div className="mt-4">
+      <div className="space-y-4">
         <label className="block text-sm font-bold mb-2">Start Date:</label>
         <input
           type="date"
@@ -300,7 +261,7 @@ const ProductDetailsPage = ({
         />
       </div>
 
-      <div className="mt-4">
+      <div className="space-y-4">
         <label className="block text-sm font-bold mb-2">End Date:</label>
         <input
           type="date"
@@ -312,7 +273,7 @@ const ProductDetailsPage = ({
 
       {bookingType === "hour" && (
         <>
-          <div className="mt-4">
+          <div className="space-y-4">
             <label className="block text-sm font-bold mb-2">Start Hour:</label>
             <input
               type="time"
@@ -322,7 +283,7 @@ const ProductDetailsPage = ({
             />
           </div>
 
-          <div className="mt-4">
+          <div className="space-y-4">
             <label className="block text-sm font-bold mb-2">End Hour:</label>
             <input
               type="time"
@@ -338,47 +299,14 @@ const ProductDetailsPage = ({
         <p className="text-lg font-bold">Total Price: ${totalPrice}</p>
       </div>
 
-      <div className="flex justify-between mt-4">
+      <div className="mt-6 flex justify-between items-center">
         <button
           onClick={handleBookNow}
-          className="bg-green-600 text-white px-2 py-1 text-sm rounded hover:bg-green-700 transition flex items-center space-x-2"
+          className="bg-green-600 text-white px-6 py-3 rounded-lg flex items-center space-x-2"
         >
           <FaCartPlus />
           <span>Book Now</span>
         </button>
-      </div>
-
-      <div className="mt-8">
-        <h3 className="text-lg font-bold mb-4">Ratings & Reviews</h3>
-        {product.reviews && product.reviews.length > 0
-          ? product.reviews.map((review, index) => (
-              <div key={index} className="border p-4 rounded-lg mb-4">
-                <p className="text-sm font-bold">{review.user}</p>
-                <p className="flex items-center">
-                  {[...Array(review.rating)].map((_, i) => (
-                    <FaStar key={i} className="text-yellow-500" />
-                  ))}
-                  {[...Array(5 - review.rating)].map((_, i) => (
-                    <FaStar key={i} className="text-gray-400" />
-                  ))}
-                </p>
-                <p className="text-sm">{review.comment}</p>
-              </div>
-            ))
-          : reviews[product.category]?.map((review, index) => (
-              <div key={index} className="border p-4 rounded-lg mb-4">
-                <p className="text-sm font-bold">{review.user}</p>
-                <p className="flex items-center">
-                  {[...Array(review.rating)].map((_, i) => (
-                    <FaStar key={i} className="text-yellow-500" />
-                  ))}
-                  {[...Array(5 - review.rating)].map((_, i) => (
-                    <FaStar key={i} className="text-gray-400" />
-                  ))}
-                </p>
-                <p className="text-sm">{review.comment}</p>
-              </div>
-            ))}
       </div>
     </div>
   );

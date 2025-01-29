@@ -36,3 +36,12 @@
     transform: rotate(360deg);
   }
 }
+
+/* Add this to your stylesheet */
+nav button:hover {
+  border-bottom: 2px solid white; /* Ensure it has a visible effect */
+}
+
+nav button.active {
+  border-bottom: 2px solid white; /* Active section gets a thicker border */
+}

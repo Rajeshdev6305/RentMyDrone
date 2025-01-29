@@ -65,87 +65,47 @@ const PaymentPage = () => {
   const totalAmount = calculatedTotalPrice;
 
   return (
-    <div className="">
-      <button onClick={handleBack} className="bg-gray-600 text-white px-2 py-1 text-sm rounded mb-4">
-        Back
-      </button>
-      <h2 className="text-xl font-bold mb-4">Payment</h2>
-      <div className="border p-4 rounded-lg">
-        <div>
-          <h3 className="text-lg font-bold">{product.name}</h3>
-          <p className="text-sm text-blue-600 font-bold">
+    <div className="min-h-screen flex flex-col items-center bg-gray-50 p-4">
+      {/* Adjusted the parent div to align "Back" button to the left */}
+      <div className="w-full flex justify-start mb-6">
+        <button onClick={handleBack} className="bg-gray-600 text-white px-4 py-2 rounded">
+          Back
+        </button>
+      </div>
+
+      <div className="bg-white rounded-lg shadow-lg p-6 w-full sm:w-4/5 lg:w-2/3">
+        <h2 className="text-2xl font-bold mb-4 text-center">Payment</h2>
+        <div className="mb-4">
+          <h3 className="text-xl font-semibold">{product.name}</h3>
+          <p className="text-sm text-blue-600 font-bold mb-2">
             {bookingType === "hour" && `$${product.pricePerHour} per hour`}
             {bookingType === "day" && `$${product.pricePerDay} per day`}
             {bookingType === "month" && `$${product.pricePerMonth} per month`}
           </p>
           <p>Booking Duration: {bookingDuration} {bookingType}(s)</p>
           <p>Quantity: {quantity}</p>
-          <p>Total Price: ${totalAmount}</p>
+          <p className="font-semibold">Total Price: ${totalAmount}</p>
         </div>
-        <div className="mt-4">
-          <h3 className="text-lg font-bold">Total Amount: ${totalAmount}</h3>
-        </div>
-        <form onSubmit={handlePayment} className="space-y-4">
-          {/* Payment Method Selection */}
-          <div className="flex space-x-4">
-            <label>
-              <input
-                type="radio"
-                name="paymentMethod"
-                value="card"
-                checked={paymentMethod === "card"}
-                onChange={() => setPaymentMethod("card")}
-                className="mr-2"
-              />
-              Pay with Card
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="paymentMethod"
-                value="bank"
-                checked={paymentMethod === "bank"}
-                onChange={() => setPaymentMethod("bank")}
-                className="mr-2"
-              />
-              Pay with Bank
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="paymentMethod"
-                value="upi"
-                checked={paymentMethod === "upi"}
-                onChange={() => setPaymentMethod("upi")}
-                className="mr-2"
-              />
-              Pay with UPI
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="paymentMethod"
-                value="paypal"
-                checked={paymentMethod === "paypal"}
-                onChange={() => setPaymentMethod("paypal")}
-                className="mr-2"
-              />
-              Pay with PayPal
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="paymentMethod"
-                value="paytm"
-                checked={paymentMethod === "paytm"}
-                onChange={() => setPaymentMethod("paytm")}
-                className="mr-2"
-              />
-              Pay with Paytm
-            </label>
-          </div>
 
-          {/* Payment Details */}
+        {/* Payment Method Selection */}
+        <div className="flex flex-wrap justify-center mb-4">
+          {["card", "bank", "upi", "paypal", "paytm"].map((method) => (
+            <label key={method} className="mr-6 flex items-center cursor-pointer">
+              <input
+                type="radio"
+                name="paymentMethod"
+                value={method}
+                checked={paymentMethod === method}
+                onChange={() => setPaymentMethod(method)}
+                className="mr-2"
+              />
+              {`Pay with ${method.charAt(0).toUpperCase() + method.slice(1)}`}
+            </label>
+          ))}
+        </div>
+
+        {/* Payment Details Form */}
+        <form onSubmit={handlePayment} className="space-y-4">
           {paymentMethod === "card" && (
             <>
               <input
@@ -154,7 +114,7 @@ const PaymentPage = () => {
                 placeholder="Card Number"
                 value={paymentDetails.cardNumber}
                 onChange={handleInputChange}
-                className="w-full p-2 border"
+                className="w-full p-3 border rounded-md"
                 required
               />
               <input
@@ -163,29 +123,32 @@ const PaymentPage = () => {
                 placeholder="Cardholder Name"
                 value={paymentDetails.cardHolderName}
                 onChange={handleInputChange}
-                className="w-full p-2 border"
+                className="w-full p-3 border rounded-md"
                 required
               />
-              <input
-                type="text"
-                name="expirationDate"
-                placeholder="Expiration Date (MM/YY)"
-                value={paymentDetails.expirationDate}
-                onChange={handleInputChange}
-                className="w-full p-2 border"
-                required
-              />
-              <input
-                type="text"
-                name="cvv"
-                placeholder="CVV"
-                value={paymentDetails.cvv}
-                onChange={handleInputChange}
-                className="w-full p-2 border"
-                required
-              />
+              <div className="flex space-x-4">
+                <input
+                  type="text"
+                  name="expirationDate"
+                  placeholder="Expiration Date (MM/YY)"
+                  value={paymentDetails.expirationDate}
+                  onChange={handleInputChange}
+                  className="w-1/2 p-3 border rounded-md"
+                  required
+                />
+                <input
+                  type="text"
+                  name="cvv"
+                  placeholder="CVV"
+                  value={paymentDetails.cvv}
+                  onChange={handleInputChange}
+                  className="w-1/2 p-3 border rounded-md"
+                  required
+                />
+              </div>
             </>
           )}
+
           {paymentMethod === "bank" && (
             <input
               type="text"
@@ -193,10 +156,11 @@ const PaymentPage = () => {
               placeholder="Bank Account Number"
               value={paymentDetails.bankAccount}
               onChange={handleInputChange}
-              className="w-full p-2 border"
+              className="w-full p-3 border rounded-md"
               required
             />
           )}
+
           {paymentMethod === "upi" && (
             <input
               type="text"
@@ -204,10 +168,11 @@ const PaymentPage = () => {
               placeholder="UPI ID"
               value={paymentDetails.upiId}
               onChange={handleInputChange}
-              className="w-full p-2 border"
+              className="w-full p-3 border rounded-md"
               required
             />
           )}
+
           {paymentMethod === "paypal" && (
             <input
               type="email"
@@ -215,10 +180,11 @@ const PaymentPage = () => {
               placeholder="PayPal Email"
               value={paymentDetails.paypalEmail}
               onChange={handleInputChange}
-              className="w-full p-2 border"
+              className="w-full p-3 border rounded-md"
               required
             />
           )}
+
           {paymentMethod === "paytm" && (
             <input
               type="text"
@@ -226,12 +192,12 @@ const PaymentPage = () => {
               placeholder="Paytm Number"
               value={paymentDetails.paytmNumber}
               onChange={handleInputChange}
-              className="w-full p-2 border"
+              className="w-full p-3 border rounded-md"
               required
             />
           )}
 
-          <button type="submit" className="w-full bg-blue-600 text-white px-2 py-1 text-sm rounded">
+          <button type="submit" className="w-full bg-blue-600 text-white py-3 rounded-md mt-6">
             Complete Payment
           </button>
         </form>
