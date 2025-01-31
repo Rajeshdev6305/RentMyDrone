@@ -54,6 +54,26 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
       return;
     }
 
+    if (!product) {
+      alert("Product details are not available.");
+      return;
+    }
+
+    const existingOrders = JSON.parse(localStorage.getItem("orders")) || [];
+    const isBooked = existingOrders.some((order) => {
+      return (
+        order.product &&
+        order.product.id === product.id &&
+        ((new Date(startDate) >= new Date(order.startDate) && new Date(startDate) <= new Date(order.endDate)) ||
+          (new Date(endDate) >= new Date(order.startDate) && new Date(endDate) <= new Date(order.endDate)))
+      );
+    });
+
+    if (isBooked) {
+      alert("This product is already booked for the selected dates.");
+      return;
+    }
+
     navigate("/payment", {
       state: {
         product,

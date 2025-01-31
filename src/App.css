@@ -45,3 +45,4 @@ nav button:hover {
 nav button.active {
   border-bottom: 2px solid white; /* Active section gets a thicker border */
 }
+

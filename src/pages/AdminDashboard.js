@@ -25,6 +25,7 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
   const [imagePreview, setImagePreview] = useState(null);
   const [editingProduct, setEditingProduct] = useState(null);
   const [viewMyProducts, setViewMyProducts] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const imageInputRef = useRef(null);
   const formRef = useRef(null);
 
@@ -55,47 +56,51 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
 
   const handleAddProduct = (e) => {
     e.preventDefault();
-    if (editingProduct) {
-      const updatedProducts = products.map((product) =>
-        product.id === editingProduct.id ? { ...product, ...formData } : product
-      );
-      setProducts(updatedProducts);
-      setEditingProduct(null);
-      alert("Product updated successfully!");
-    } else {
-      const newProduct = {
-        id: Date.now(),
-        ...formData,
-        addedBy: currentAdmin,
-      };
-      const updatedProducts = [...products, newProduct].sort((a, b) =>
-        a.category.localeCompare(b.category)
-      );
-      setProducts(updatedProducts);
-      alert("Product added successfully!");
-    }
-    setFormData({
-      name: "",
-      model: "",
-      pricePerHour: "",
-      pricePerDay: "",
-      pricePerMonth: "",
-      controlRange: "",
-      type: "",
-      speed: "",
-      weight: "",
-      cameraQuality: "",
-      payloadCapacity: "",
-      sprayCapacity: "",
-      batteryLife: "",
-      usefulUses: "",
-      additionalSpecs: "",
-      description: "",
-      category: "",
-      image: "",
-    });
-    setImagePreview(null);
-    imageInputRef.current.value = null;
+    setIsLoading(true);
+    setTimeout(() => {
+      if (editingProduct) {
+        const updatedProducts = products.map((product) =>
+          product.id === editingProduct.id ? { ...product, ...formData } : product
+        );
+        setProducts(updatedProducts);
+        setEditingProduct(null);
+        alert("Product updated successfully!");
+      } else {
+        const newProduct = {
+          id: Date.now(),
+          ...formData,
+          addedBy: currentAdmin,
+        };
+        const updatedProducts = [...products, newProduct].sort((a, b) =>
+          a.category.localeCompare(b.category)
+        );
+        setProducts(updatedProducts);
+        alert("Product added successfully!");
+      }
+      setFormData({
+        name: "",
+        model: "",
+        pricePerHour: "",
+        pricePerDay: "",
+        pricePerMonth: "",
+        controlRange: "",
+        type: "",
+        speed: "",
+        weight: "",
+        cameraQuality: "",
+        payloadCapacity: "",
+        sprayCapacity: "",
+        batteryLife: "",
+        usefulUses: "",
+        additionalSpecs: "",
+        description: "",
+        category: "",
+        image: "",
+      });
+      setImagePreview(null);
+      imageInputRef.current.value = null;
+      setIsLoading(false);
+    }, 1000); // Simulate loading
   };
 
   const handleEditProduct = (product) => {
@@ -126,168 +131,184 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
     : products;
 
   return (
-    <div>
-      <h2 className="text-xl font-bold mb-4">
+    <div className="p-6 bg-gray-50 min-h-screen">
+      <h2 className="text-3xl font-bold text-gray-800 mb-8">
         {editingProduct ? "Edit Product" : "Add New Product"}
       </h2>
       <form
         onSubmit={handleAddProduct}
-        className="flex gap-6 p-4 max-w-screen-md mx-auto space-y-4"
+        className="bg-white p-8 rounded-lg shadow-lg max-w-4xl mx-auto"
         ref={formRef}
       >
-        {/* Image Section on the Left */}
-        <div className="w-1/2 hover:scale-105 transition-all">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            ref={imageInputRef}
-            className="w-full p-2 border"
-          />
-          {imagePreview && (
-            <img
-              src={imagePreview}
-              alt="Preview"
-              className="w-full h-80 object-cover mt-2 rounded-lg"
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Image Section */}
+          <div className="space-y-4">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              ref={imageInputRef}
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-          )}
-        </div>
+            {imagePreview && (
+              <img
+                src={imagePreview}
+                alt="Preview"
+                className="w-full h-80 object-cover rounded-lg shadow-md"
+              />
+            )}
+          </div>
 
-        {/* Form Section on the Right */}
-        <div className="w-1/2 hover:scale-105 transition-all">
-          <input
-            type="text"
-            name="name"
-            placeholder="Product Name"
-            value={formData.name}
-            onChange={handleChange}
-            className="w-full p-2 border mb-4"
-            required
-          />
-          <input
-            type="text"
-            name="model"
-            placeholder="Model"
-            value={formData.model}
-            onChange={handleChange}
-            className="w-full p-2 border mb-4"
-            required
-          />
-          <input
-            type="number"
-            name="pricePerHour"
-            placeholder="Price Per Hour"
-            value={formData.pricePerHour}
-            onChange={handleChange}
-            className="w-full p-2 border mb-4"
-            required
-          />
-          <input
-            type="number"
-            name="pricePerDay"
-            placeholder="Price Per Day"
-            value={formData.pricePerDay}
-            onChange={handleChange}
-            className="w-full p-2 border mb-4"
-            required
-          />
-          <input
-            type="number"
-            name="pricePerMonth"
-            placeholder="Price Per Month"
-            value={formData.pricePerMonth}
-            onChange={handleChange}
-            className="w-full p-2 border mb-4"
-            required
-          />
-          <textarea
-            name="description"
-            placeholder="Description"
-            value={formData.description}
-            onChange={handleChange}
-            className="w-full p-2 border mb-4"
-            required
-          />
-          <input
-            type="text"
-            name="category"
-            placeholder="Category"
-            value={formData.category}
-            onChange={handleChange}
-            className="w-full p-2 border mb-4"
-            required
-          />
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white px-2 py-1 text-sm rounded"
-          >
-            {editingProduct ? "Update Product" : "Add Product"}
-          </button>
+          {/* Form Section */}
+          <div className="space-y-4">
+            <input
+              type="text"
+              name="name"
+              placeholder="Product Name"
+              value={formData.name}
+              onChange={handleChange}
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <input
+              type="text"
+              name="model"
+              placeholder="Model"
+              value={formData.model}
+              onChange={handleChange}
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <input
+              type="number"
+              name="pricePerHour"
+              placeholder="Price Per Hour"
+              value={formData.pricePerHour}
+              onChange={handleChange}
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <input
+              type="number"
+              name="pricePerDay"
+              placeholder="Price Per Day"
+              value={formData.pricePerDay}
+              onChange={handleChange}
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <input
+              type="number"
+              name="pricePerMonth"
+              placeholder="Price Per Month"
+              value={formData.pricePerMonth}
+              onChange={handleChange}
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <textarea
+              name="description"
+              placeholder="Description"
+              value={formData.description}
+              onChange={handleChange}
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <input
+              type="text"
+              name="category"
+              placeholder="Category"
+              value={formData.category}
+              onChange={handleChange}
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center justify-center"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+              ) : editingProduct ? (
+                "Update Product"
+              ) : (
+                "Add Product"
+              )}
+            </button>
+          </div>
         </div>
       </form>
 
       {/* Available Products Section */}
-      <div className="flex justify-between items-center mt-8 mb-4">
-        <h2 className="text-xl font-bold">Available Products</h2>
-        <button
-          onClick={() => setViewMyProducts(!viewMyProducts)}
-          className="bg-blue-600 text-white px-2 py-1 text-sm rounded hover:bg-blue-700 transition flex items-center space-x-2"
-        >
-          {viewMyProducts ? <FaEyeSlash /> : <FaEye />}
-          <span>
-            {viewMyProducts ? "View All Products" : "View My Products"}
-          </span>
-        </button>
-      </div>
-      {Object.keys(groupedProducts).map((category) => (
-        <div key={category}>
-          <h3 className="text-lg font-bold mb-4">{category}</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {groupedProducts[category]
-              .filter((product) => filteredProducts.includes(product))
-              .map((product) => (
-                <div
-                  key={product.id}
-                  className="border p-4 shadow rounded-lg transition hover:shadow-lg hover:scale-105 cursor-pointer"
-                >
-                  <img
-                    src={
-                      product.image.startsWith("data:image")
-                        ? product.image
-                        : `${process.env.PUBLIC_URL}/${product.image}`
-                    }
-                    alt={product.name}
-                    className="w-full h-64 object-cover mb-2 rounded"
-                  />
-                  <h3 className="text-lg font-bold">{product.name}</h3>
-                  <p className="text-sm">{product.description}</p>
-                  <p className="text-sm text-blue-600 font-bold">
-                    ${product.pricePerDay} per day
-                  </p>
-                  <p className="text-xs text-gray-600">{product.category}</p>
-                  {product.addedBy === currentAdmin && (
-                    <div className="flex justify-between mt-2">
-                      <button
-                        onClick={() => handleEditProduct(product)}
-                        className="bg-yellow-500 text-white px-2 py-1 text-sm rounded mr-2 flex items-center space-x-2"
-                      >
-                        <FaEdit />
-                        <span>Edit</span>
-                      </button>
-                      <button
-                        onClick={() => handleDeleteProduct(product.id)}
-                        className="bg-red-500 text-white px-2 py-1 text-sm rounded flex items-center space-x-2"
-                      >
-                        <FaTrash />
-                        <span>Delete</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ))}
-          </div>
+      <div className="mt-12">
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-3xl font-bold text-gray-800">Available Products</h2>
+          <button
+            onClick={() => setViewMyProducts(!viewMyProducts)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center space-x-2"
+          >
+            {viewMyProducts ? <FaEyeSlash /> : <FaEye />}
+            <span>
+              {viewMyProducts ? "View All Products" : "View My Products"}
+            </span>
+          </button>
         </div>
-      ))}
+        {Object.keys(groupedProducts).map((category) => (
+          <div key={category} className="mb-8">
+            <h3 className="text-2xl font-bold text-gray-800 mb-6">{category}</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {groupedProducts[category]
+                .filter((product) => filteredProducts.includes(product))
+                .map((product) => (
+                  <div
+                    key={product.id}
+                    id={`product-${product.id}`}
+                    className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+                  >
+                    <img
+                      src={
+                        product.image.startsWith("data:image")
+                          ? product.image
+                          : `${process.env.PUBLIC_URL}/${product.image}`
+                      }
+                      alt={product.name}
+                      className="w-full h-48 object-cover rounded-lg mb-4"
+                    />
+                    <h3 className="text-xl font-bold text-gray-800 mb-2">
+                      {product.name}
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-2">
+                      {product.description}
+                    </p>
+                    <p className="text-lg font-bold text-blue-600">
+                      ${product.pricePerDay} per day
+                    </p>
+                    <p className="text-xs text-gray-500">{product.category}</p>
+                    {product.addedBy === currentAdmin && (
+                      <div className="flex justify-between mt-4">
+                        <button
+                          onClick={() => handleEditProduct(product)}
+                          className="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-600 transition duration-300 flex items-center space-x-2"
+                        >
+                          <FaEdit />
+                          <span>Edit</span>
+                        </button>
+                        <button
+                          onClick={() => handleDeleteProduct(product.id)}
+                          className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition duration-300 flex items-center space-x-2"
+                        >
+                          <FaTrash />
+                          <span>Delete</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

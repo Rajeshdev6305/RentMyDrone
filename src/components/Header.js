@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import {
   FaHome,
   FaInfoCircle,
@@ -10,6 +11,8 @@ import {
   FaProductHunt,
   FaBars,
   FaTimes,
+  FaClipboardList,
+  FaUserCircle,
 } from "react-icons/fa";
 import { auth } from "../Authentication/firebaseConfig";
 
@@ -23,10 +26,12 @@ const Header = ({
 }) => {
   const navigate = useNavigate();
   const [cartCount, setCartCount] = useState(0);
+  const [orderCount, setOrderCount] = useState(0);
   const [suggestions, setSuggestions] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
   const [userDetails, setUserDetails] = useState({});
-  const [activeSection, setActiveSection] = useState(""); // To track the active section
+  const [activeSection, setActiveSection] = useState("");
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
   useEffect(() => {
     setCartCount(cartItems.reduce((acc, item) => acc + item.quantity, 0));
@@ -41,6 +46,12 @@ const Header = ({
       if (currentUser) {
         setUserDetails(currentUser);
       }
+
+      const storedOrders = JSON.parse(localStorage.getItem("orders")) || [];
+      const userOrders = storedOrders.filter(
+        (order) => order.userEmail === auth.currentUser.email
+      );
+      setOrderCount(userOrders.length);
     }
   }, [isLoggedIn]);
 
@@ -48,6 +59,7 @@ const Header = ({
     setIsLoggedIn(false);
     navigate("/login");
     setMenuOpen(false);
+    setProfileMenuOpen(false);
   };
 
   const handleSearch = (e) => {
@@ -68,8 +80,10 @@ const Header = ({
       const productElement = document.getElementById(`product-${product.id}`);
       if (productElement) {
         productElement.scrollIntoView({ behavior: "smooth" });
-      } else {
-        console.log("Product element not found");
+        productElement.classList.add("bg-yellow-100");
+        setTimeout(() => {
+          productElement.classList.remove("bg-yellow-100");
+        }, 2000);
       }
     } else {
       navigate(`/product/${product.id}`, { state: { product } });
@@ -82,7 +96,7 @@ const Header = ({
     const section = document.getElementById(sectionId);
     section.scrollIntoView({ behavior: "smooth" });
     setMenuOpen(false);
-    setActiveSection(sectionId); // Set the active section
+    setActiveSection(sectionId);
   };
 
   const handleProductClick = () => {
@@ -92,7 +106,11 @@ const Header = ({
         formSection.scrollIntoView({ behavior: "smooth" });
       }
     } else {
-      navigate("/user-dashboard");
+      if (window.location.pathname === "/user-dashboard") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        navigate("/user-dashboard");
+      }
     }
     setMenuOpen(false);
   };
@@ -102,126 +120,248 @@ const Header = ({
     setMenuOpen(false);
   };
 
+  const handleOrdersClick = () => {
+    navigate("/my-orders");
+    setMenuOpen(false);
+  };
+
+  const handleHomeClick = () => {
+    if (window.location.pathname === "/") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      navigate("/");
+    }
+    setMenuOpen(false);
+  };
+
+  const handleLoginClick = () => {
+    if (window.location.pathname === "/login") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      navigate("/login");
+    }
+    setMenuOpen(false);
+  };
+
+  const handleSignUpClick = () => {
+    if (window.location.pathname === "/signup") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      navigate("/signup");
+    }
+    setMenuOpen(false);
+  };
+
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
 
+  const toggleProfileMenu = () => {
+    setProfileMenuOpen(!profileMenuOpen);
+  };
+
+  const handleAddProductClick = () => {
+    if (window.location.pathname === "/admin") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      navigate("/admin");
+    }
+    setMenuOpen(false);
+  };
+
   return (
-    <header className="bg-gray-800 bo text-white p-4 flex justify-between items-center shadow-lg fixed top-0 left-0 w-full z-50">
+    <header className="bg-gray-600 text-white p-4 flex justify-between items-center shadow-lg fixed top-0 left-0 w-full z-50">
       {/* Logo and Title */}
       <div className="flex items-center">
         <img
-            src="https://img.freepik.com/premium-photo/delivery-drone-online-delivery-concept-sydney-opera-house-ai-generated_599862-1237.jpg"
-            alt="Logo"
-            className="h-12 w-12 mr-2 rounded-full object-cover"
+          src="https://img.freepik.com/premium-photo/delivery-drone-online-delivery-concept-sydney-opera-house-ai-generated_599862-1237.jpg"
+          alt="Logo"
+          className="h-12 w-12 mr-2 rounded-full object-cover border-2 border-white"
         />
-        {!menuOpen && <h1 className="text-xl font-bold">Drone Delivery Service</h1>}
+        {!menuOpen && (
+          <h1 className="text-xl font-bold text-white">Drone Delivery Service</h1>
+        )}
       </div>
 
       {/* Search Bar (Only for Logged-in Users) */}
       {isLoggedIn && (
-        <div className={`relative flex-1 mx-4 ${menuOpen ? "hidden" : "flex"}`}>
-          <input
-            type="text"
-            placeholder="Search for a product..."
-            onChange={handleSearch}
-            className="p-2 rounded bg-gray-700 text-white w-full"
-          />
-          {suggestions.length > 0 && (
-            <ul className="absolute bg-white text-black w-full mt-1 rounded shadow-lg">
-              {suggestions.map((product) => (
-                <li
-                  key={product.id}
-                  onClick={() => handleSuggestionClick(product)}
-                  className="p-2 hover:bg-gray-200 cursor-pointer"
-                >
-                  {product.name}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        <SearchBar
+          handleSearch={handleSearch}
+          suggestions={suggestions}
+          handleSuggestionClick={handleSuggestionClick}
+          menuOpen={menuOpen}
+        />
       )}
 
       {/* Mobile Menu Toggle */}
-      <button onClick={toggleMenu} className="md:hidden absolute top-4 right-4">
-        {menuOpen ? <FaTimes /> : <FaBars />}
-      </button>
+      <MobileMenuToggle menuOpen={menuOpen} toggleMenu={toggleMenu} />
 
       {/* Navigation */}
-      <nav className={`flex-col md:flex-row md:flex items-center space-x-4 ${menuOpen ? "flex" : "hidden"} md:flex`}>
-        {/* Links */}
+      <nav
+        className={`flex-col md:flex-row md:flex items-center space-x-4 ${
+          menuOpen ? "flex" : "hidden"
+        } md:flex`}
+      >
         {!isLoggedIn && (
-          <button
-            onClick={() => navigate("/")}
-            className="text-white flex items-center space-x-2 px-2 py-1 text-sm hover:text-gray-300"
-            >
-            <FaHome />
-            <span>Home</span>
-          </button>
+          <NavLink
+            icon={<FaHome />}
+            label="Home"
+            onClick={handleHomeClick}
+            isActive={activeSection === "home"}
+          />
         )}
         {isLoggedIn && userType !== "admin" && (
-          <button
+          <NavLink
+            icon={<FaProductHunt />}
+            label="Products"
             onClick={handleProductClick}
-            className="text-white flex items-center space-x-2 px-2 py-1 text-sm hover:text-gray-300"
-            >
-            <FaProductHunt />
-            <span>Products</span>
-          </button>
+            isActive={activeSection === "products"}
+          />
         )}
         {!isLoggedIn && (
           <>
-            <button
-              onClick={() => navigate("/login")}
-              className="text-white flex items-center space-x-2 px-2 py-1 text-sm hover:text-gray-300"
-              >
-              <FaSignInAlt />
-              <span>Login</span>
-            </button>
-            <button
-              onClick={() => navigate("/signup")}
-              className="text-white flex items-center space-x-2 px-2 py-1 text-sm hover:text-gray-300"
-              >
-              <FaUserPlus />
-              <span>Sign Up</span>
-            </button>
+            <NavLink
+              icon={<FaSignInAlt />}
+              label="Login"
+              onClick={handleLoginClick}
+              isActive={activeSection === "login"}
+            />
+            <NavLink
+              icon={<FaUserPlus />}
+              label="Sign Up"
+              onClick={handleSignUpClick}
+              isActive={activeSection === "signup"}
+            />
           </>
         )}
-        <button
+        <NavLink
+          icon={<FaInfoCircle />}
+          label="About Us"
           onClick={() => scrollToSection("about-us")}
-          className="text-white flex items-center space-x-2 px-2 py-1 text-sm hover:text-gray-300"
-          >
-           
-          <FaInfoCircle />
-          <span>About Us</span>
-        </button>
-
+        />
         {isLoggedIn && userType !== "admin" && (
-          <button
+          <NavLink
+            icon={<FaShoppingCart />}
+            label="Cart"
             onClick={handleCartClick}
-            className="text-white flex items-center space-x-2 px-2 py-1 text-sm hover:text-gray-300"
-            >
-            <FaShoppingCart />
-            <span>Cart</span>
-            {cartCount > 0 && (
-              <span className="bg-red-600 flex items-center space-x-2 text-white rounded-full px-2 py-1 text-xs ml-2">
-                {cartCount}
-              </span>
-            )}
-          </button>
+            isActive={activeSection === "cart"}
+            badge={cartCount > 0 ? cartCount : null}
+          />
+        )}
+        {isLoggedIn && userType !== "admin" && (
+          <NavLink
+            icon={<FaClipboardList />}
+            label="My Orders"
+            onClick={handleOrdersClick}
+            isActive={activeSection === "my-orders"}
+            badge={orderCount > 0 ? orderCount : null}
+          />
+        )}
+        {isLoggedIn && userType === "admin" && (
+          <NavLink
+            icon={<FaProductHunt />}
+            label="Add Product"
+            onClick={handleAddProductClick}
+            isActive={activeSection === "add-product"}
+          />
         )}
         {isLoggedIn && (
-          <button
+          <div className="relative hidden md:block">
+            <button
+              onClick={toggleProfileMenu}
+              className="text-white flex items-center space-x-2 px-4 py-2 text-sm hover:bg-gray-700 rounded-lg transition-colors duration-200"
+            >
+              <FaUserCircle size={24} />
+            </button>
+            {profileMenuOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left px-3 py-1 text-sm text-gray-700 hover:bg-gray-200"
+                >
+                  <FaSignOutAlt className="mr-2" />
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+        {isLoggedIn && (
+          <NavLink
+            icon={<FaSignOutAlt />}
+            label="Logout"
             onClick={handleLogout}
-            className="bg-red-600 flex items-center space-x-2  text-white px-2 py-1 text-sm rounded hover:bg-red-700"
-          >
-            <FaSignOutAlt />
-            <span>Logout</span>
-          </button>
+            isActive={activeSection === "logout"}
+            className="bg-red-600 hover:bg-red-700 md:hidden"
+          />
         )}
       </nav>
     </header>
   );
 };
+
+// Reusable Components
+
+const SearchBar = ({
+  handleSearch,
+  suggestions,
+  handleSuggestionClick,
+  menuOpen,
+}) => (
+  <div className={`relative flex-1 mx-4 ${menuOpen ? "hidden" : "flex"}`}>
+    <input
+      type="text"
+      placeholder="Search for a product..."
+      onChange={handleSearch}
+      className="p-2 rounded bg-gray-700 text-white w-full focus:outline-none focus:ring-2 focus:ring-white placeholder-gray-300"
+    />
+    {suggestions.length > 0 && (
+      <ul className="absolute left-0 bg-gray-700 text-white w-full mt-1 rounded shadow-lg max-h-60 overflow-y-auto z-50">
+        {suggestions.map((product) => (
+          <li
+            key={product.id}
+            onClick={() => handleSuggestionClick(product)}
+            className="p-2 hover:bg-gray-600 cursor-pointer transition-colors duration-200"
+          >
+            {product.name}
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+);
+
+const MobileMenuToggle = ({ menuOpen, toggleMenu }) => (
+  <button
+    onClick={toggleMenu}
+    className="md:hidden absolute top-4 right-4 text-white hover:text-gray-300 transition-colors duration-200"
+  >
+    {menuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+  </button>
+);
+
+const NavLink = ({
+  icon,
+  label,
+  onClick,
+  isActive,
+  badge = null,
+  className = "",
+}) => (
+  <button
+    onClick={onClick}
+    className={`text-white flex items-center space-x-2 px-4 py-2 text-sm hover:bg-gray-700 rounded-lg transition-colors duration-200 ${
+      isActive ? "bg-gray-700" : ""
+    } ${className}`}
+  >
+    {icon}
+    <span>{label}</span>
+    {badge !== null && (
+      <span className="bg-red-600 text-white rounded-full px-2 py-1 text-xs">
+        {badge}
+      </span>
+    )}
+  </button>
+);
 
 export default Header;

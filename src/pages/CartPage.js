@@ -57,74 +57,109 @@ const CartPage = ({ cartItems, setCartItems }) => {
   const handleViewDetails = (product) => {
     navigate(`/product/${product.id}`, { state: { product } });
   };
+  
 
   const totalAmount = cartItems.reduce((total, item) => total + Number(item.totalPrice), 0);
   const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
 
   if (cartItems.length === 0) {
-    return <p>Your cart is empty!</p>;
+    return (
+      <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-r from-blue-50 to-purple-50 p-4">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">Your cart is empty!</h2>
+        <button
+          onClick={() => navigate("/")}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-300"
+        >
+          Continue Shopping
+        </button>
+      </div>
+    );
   }
 
   return (
-    <div className="">
-      <div className="flex justify-between items-center mb-4">
-        <div>
-          <button onClick={() => navigate(-1)} className="bg-gray-600 text-white px-2 py-1 text-sm rounded mr-2">
-            Back
-          </button>
-          <button onClick={handleRemoveAll} className="bg-red-600 text-white px-2 py-1 text-sm rounded">
-            Remove All
-          </button>
-        </div>
-        <h2 className="text-xl font-bold">Total Items: {totalItems}</h2>
-        <h2 className="text-xl font-bold">Total Price: ${totalAmount}</h2>
-      </div>
-      <h2 className="text-xl font-bold mb-4">Your Cart</h2>
-      <div className="space-y-4">
-        {cartItems.map((item) => (
-          <div
-            key={item.id}
-            className="p-4 border flex justify-between items-center rounded-lg cursor-pointer"
-            onClick={() => handleViewDetails(item)}
-          >
-            <div>
-              <h3 className="text-lg font-semibold">{item.name}</h3>
-              <p className="text-sm">Price: ${item.pricePerDay} per day</p>
-              <p className="text-sm">Category: {item.category}</p>
-              <p className="text-sm">Quantity: {item.quantity}</p>
-              <p className="text-sm">Total Price: ${item.totalPrice}</p>
-            </div>
-            <div className="flex items-center">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDecreaseQuantity(item.id);
-                }}
-                className="bg-gray-300 text-black px-2 py-1 text-sm rounded-lg mr-2"
-              >
-                -
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleIncreaseQuantity(item.id);
-                }}
-                className="bg-gray-300 text-black px-2 py-1 text-sm rounded-lg mr-2"
-              >
-                +
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleRemoveItem(item.id);
-                }}
-                className="bg-red-500 text-white px-2 py-1 text-sm rounded-lg"
-              >
-                Remove
-              </button>
-            </div>
+    <div className="min-h-screen bg-gradient-to-r from-blue-50 to-purple-50 p-6">
+      <div className="max-w-4xl mx-auto">
+        {/* Header Section */}
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <button
+              onClick={() => navigate(-1)}
+              className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors duration-300 mr-2"
+            >
+              Back
+            </button>
+            <button
+              onClick={handleRemoveAll}
+              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors duration-300"
+            >
+              Remove All
+            </button>
           </div>
-        ))}
+          <div className="text-right">
+            <h2 className="text-xl font-bold text-gray-800">Total Items: {totalItems}</h2>
+            <h2 className="text-xl font-bold text-gray-800">Total Price: ${totalAmount.toFixed(2)}</h2>
+          </div>
+        </div>
+
+        {/* Cart Items Section */}
+        <h2 className="text-2xl font-bold text-gray-800 mb-6">Your Cart</h2>
+        <div className="space-y-4">
+          {cartItems.map((item) => (
+            <div
+              key={item.id}
+              className="p-6 bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex"
+              onClick={() => handleViewDetails(item)}
+            >
+              <img
+                src={
+                  item.image.startsWith("data:image")
+                    ? item.image
+                    : `${process.env.PUBLIC_URL}/${item.image}`
+                }
+                alt={item.name}
+                className="w-32 h-32 object-cover rounded-lg mr-4"
+              />
+              <div className="flex-grow">
+                <h3 className="text-lg font-semibold text-gray-800">{item.name}</h3>
+                <p className="text-sm text-gray-600">Price: ${item.pricePerDay} per day</p>
+                <p className="text-sm text-gray-600">Category: {item.category}</p>
+                <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
+                <p className="text-sm text-gray-600">Total Price: ${item.totalPrice.toFixed(2)}</p>
+                <div className="flex items-center space-x-2 mt-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDecreaseQuantity(item.id);
+                    }}
+                    className="bg-gray-200 text-gray-800 px-3 py-1 rounded-lg hover:bg-gray-300 transition-colors duration-300"
+                  >
+                    -
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleIncreaseQuantity(item.id);
+                    }}
+                    className="bg-gray-200 text-gray-800 px-3 py-1 rounded-lg hover:bg-gray-300 transition-colors duration-300"
+                  >
+                    +
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveItem(item.id);
+                    }}
+                    className="bg-red-500 text-white px-4 py-1 rounded-lg hover:bg-red-600 transition-colors duration-300"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+       
       </div>
     </div>
   );

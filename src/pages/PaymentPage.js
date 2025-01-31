@@ -45,6 +45,24 @@ const PaymentPage = () => {
   const handlePayment = (e) => {
     e.preventDefault();
     alert("Payment successful!");
+
+    const newOrder = {
+      id: Date.now(),
+      product,
+      totalPrice: calculatedTotalPrice,
+      quantity,
+      bookingType,
+      bookingDuration,
+      deliveryAddress,
+      startDate,
+      endDate,
+      paymentStatus: "Paid",
+    };
+
+    const existingOrders = JSON.parse(localStorage.getItem("orders")) || [];
+    existingOrders.push(newOrder);
+    localStorage.setItem("orders", JSON.stringify(existingOrders));
+
     // Empty all inputs
     setPaymentDetails({
       cardNumber: "",
@@ -56,6 +74,8 @@ const PaymentPage = () => {
       paypalEmail: "",
       paytmNumber: "",
     });
+
+    navigate("/my-orders");
   };
 
   const handleBack = () => {

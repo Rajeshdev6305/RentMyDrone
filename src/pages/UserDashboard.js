@@ -59,10 +59,11 @@ const UserDashboard = ({
       : products.filter((product) => product.category === selectedCategory);
 
   const categoryImages = {
-    All: "https://img.freepik.com/premium-photo/topdown-view-delivery-drone-with-new-cityscape-background-ai_894067-1262.jpg",
-    Marriage: "/images/marriage-category.jpg",
-    "Food Delivery": "/images/food-delivery-category.jpg",
-    Farming: "/images/farming-category.jpg",
+    All: "https://img.freepik.com/premium-photo/drone-flying-modern-cityscape-sunset-ai-generated-image_548729-4502.jpg",
+    Marriage: "https://img.freepik.com/premium-photo/photo-drone-with-camera-remote-control-aerial-photography_933496-28343.jpg",
+    "Food Delivery":
+      "https://files.oaiusercontent.com/file-KP9VxT7U6L8tYKUMtqZzme?se=2025-01-30T22%3A03%3A09Z&sp=r&sv=2024-08-04&sr=b&rscc=max-age%3D604800%2C%20immutable%2C%20private&rscd=attachment%3B%20filename%3D89ca11ab-6624-4b3e-8f70-d62dc06414f2.webp&sig=e/2ppHcUf%2Bcs/ADlyPHgf370VXWBxjQanvnJ%2BwjSPIA%3D",
+    Farming: "https://img.freepik.com/premium-photo/drone-spraying-crops-sunrise_718046-8379.jpg",
   };
 
   const categoryTexts = {
@@ -81,12 +82,14 @@ const UserDashboard = ({
           backgroundImage: `url(${categoryImages[selectedCategory]})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          height: "400px", // Increased height from 250px to 400px
+          height: "500px", // Increased height from 250px to 400px
         }}
       >
         <div className="absolute inset-0 bg-black opacity-40"></div>
         <div className="relative z-10 text-white text-center py-10">
-          <h2 className="text-3xl font-bold">{categoryTexts[selectedCategory]}</h2>
+          <h2 className="text-3xl font-bold">
+            {categoryTexts[selectedCategory]}
+          </h2>
         </div>
       </div>
 
@@ -102,10 +105,10 @@ const UserDashboard = ({
             <button
               key={category}
               onClick={() => handleCategoryChange(category)}
-              className={`px-4 py-2 text-sm font-semibold rounded-lg ${
+              className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
                 selectedCategory === category
-                  ? "bg-blue-600 text-white"
-                  : "bg-transparent border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+                  ? "bg-blue-600 text-white shadow-lg"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
               {category}
