@@ -37,7 +37,6 @@ const App = () => {
   const [cartItems, setCartItems] = useState([]);
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentAdmin, setCurrentAdmin] = useState("");
   const [currentUserEmail, setCurrentUserEmail] = useState("");
 
   useEffect(() => {
@@ -334,7 +333,6 @@ const App = () => {
                   <AdminDashboard
                     products={products}
                     setProducts={setProducts}
-                    currentAdmin={currentAdmin}
                     currentUserEmail={currentUserEmail}
                   />
                 ) : (

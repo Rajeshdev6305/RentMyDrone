@@ -48,7 +48,6 @@ const LoginPage = ({ setIsLoggedIn, setUserType }) => {
 
       // Attempt Firebase login
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
 
       // Check if auth.currentUser is not null
       if (!auth.currentUser) {

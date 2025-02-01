@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaSignOutAlt, FaCartPlus, FaInfoCircle } from "react-icons/fa";
+import { FaCartPlus, FaInfoCircle } from "react-icons/fa"; // Remove FaSignOutAlt
 import Swal from 'sweetalert2'; // Import SweetAlert2
 
 const UserDashboard = ({
@@ -46,11 +46,6 @@ const UserDashboard = ({
 
   const handleViewDetails = (product) => {
     navigate(`/product/${product.id}`, { state: { product, currentUserEmail } });
-  };
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    navigate("/login");
   };
 
   const handleCategoryChange = (category) => {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { FaArrowLeft, FaCartPlus, FaStar } from "react-icons/fa";
+import { FaArrowLeft, FaCartPlus } from "react-icons/fa"; // Remove FaStar
 import Swal from 'sweetalert2'; // Import SweetAlert2
 
 const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => {

@@ -29,7 +29,6 @@ const Header = ({
   const [orderCount, setOrderCount] = useState(0);
   const [suggestions, setSuggestions] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [userDetails, setUserDetails] = useState({});
   const [activeSection, setActiveSection] = useState("");
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
@@ -39,14 +38,6 @@ const Header = ({
 
   useEffect(() => {
     if (isLoggedIn && auth.currentUser) {
-      const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
-      const currentUser = storedUsers.find(
-        (user) => user.email === auth.currentUser.email
-      );
-      if (currentUser) {
-        setUserDetails(currentUser);
-      }
-
       const storedOrders = JSON.parse(localStorage.getItem(`orders_${auth.currentUser.email}`)) || [];
       const userOrders = storedOrders.filter(
         (order) => order.userEmail === auth.currentUser.email

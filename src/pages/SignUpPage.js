@@ -37,7 +37,7 @@ const SignUpPage = () => {
         formData.password
       );
 
-      const user = userCredential.user;
+      // const user = userCredential.user; // Remove this line if not used
 
       // Retrieve existing users from local storage
       const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
@@ -104,7 +104,7 @@ const SignUpPage = () => {
           </p>
           <img
             src="https://img.freepik.com/premium-photo/delivery-drone-online-delivery-concept-sydney-opera-house-ai-generated_599862-1237.jpg"
-            alt="SignUp Image"
+            alt="SignUp"
             className="w-full h-full max-w-xl rounded-lg transition-transform duration-300 hover:scale-105"
           />
         </div>

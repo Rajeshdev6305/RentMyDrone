@@ -25,11 +25,11 @@ const CartPage = ({ cartItems, setCartItems, currentUserEmail }) => {
       }
     }
     setLoading(false); // Set loading to false after cart items are loaded
-  }, [setCartItems, currentUserEmail]);
+  }, [setCartItems, currentUserEmail, getStoredCartItems]);
 
   useEffect(() => {
     storeCartItems(cartItems);
-  }, [cartItems, currentUserEmail]);
+  }, [cartItems, currentUserEmail, storeCartItems]);
 
   const handleRemoveItem = (itemId) => {
     setCartItems(cartItems.filter((item) => item.id !== itemId));
