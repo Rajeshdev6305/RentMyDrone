@@ -104,6 +104,10 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
   };
 
   const handleEditProduct = (product) => {
+    if (product.addedBy !== currentAdmin) {
+      alert("You can only edit products that you added.");
+      return;
+    }
     setEditingProduct(product);
     setFormData(product);
     setImagePreview(product.image);
@@ -111,6 +115,11 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
   };
 
   const handleDeleteProduct = (productId) => {
+    const productToDelete = products.find((product) => product.id === productId);
+    if (productToDelete.addedBy !== currentAdmin) {
+      alert("You can only delete products that you added.");
+      return;
+    }
     const updatedProducts = products.filter(
       (product) => product.id !== productId
     );

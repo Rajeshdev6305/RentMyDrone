@@ -17,9 +17,9 @@ import UserDashboard from "./pages/UserDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import MyOrdersPage from "./pages/MyOrdersPage";
+import { auth } from "./Authentication/firebaseConfig"; // Import auth from Firebase config
 import "./index.css"; // Ensure Tailwind CSS is imported
 import "./App.css"; // Import App.css for custom styles
-
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -38,11 +38,11 @@ const App = () => {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentAdmin, setCurrentAdmin] = useState("");
+  const [currentUserEmail, setCurrentUserEmail] = useState("");
 
- 
   useEffect(() => {
-    // Mock data for products
-    const productList = [
+    // Default products
+    const defaultProducts = [
       {
         id: 1,
         name: "Marriage Drone X1",
@@ -53,6 +53,7 @@ const App = () => {
         pricePerMonth: 2500,
         category: "Marriage",
         image: "marriage drone x1.jpg",
+        addedBy: "default",
       },
       {
         id: 2,
@@ -64,6 +65,7 @@ const App = () => {
         pricePerMonth: 3000,
         category: "Marriage",
         image:"marriage drone x2.jpg",
+        addedBy: "default",
       },
       {
         id: 3,
@@ -75,6 +77,7 @@ const App = () => {
         pricePerMonth: 3500,
         category: "Marriage",
         image: "marriage drone x3.jpg",
+        addedBy: "default",
       },
       {
         id: 4,
@@ -86,6 +89,7 @@ const App = () => {
         pricePerMonth: 4000,
         category: "Marriage",
         image: "marriage drone x4.jpg",    
+        addedBy: "default",
         },
       {
         id: 5,
@@ -96,7 +100,9 @@ const App = () => {
         pricePerDay: 200,
         pricePerMonth: 4500,
         category: "Marriage",
-        image: "marriage drone x5.jpg",      },
+        image: "marriage drone x5.jpg",      
+        addedBy: "default",
+      },
       {
         id: 6,
         name: "Food Delivery Drone X1",
@@ -107,6 +113,7 @@ const App = () => {
         pricePerMonth: 1500,
         category: "Food Delivery",
         image: "food drone x1.jpg",
+        addedBy: "default",
       },
       {
         id: 7,
@@ -118,6 +125,7 @@ const App = () => {
         pricePerMonth: 1800,
         category: "Food Delivery",
         image: "food drone x2.jpg",
+        addedBy: "default",
       },
       {
         id: 8,
@@ -129,6 +137,7 @@ const App = () => {
         pricePerMonth: 2000,
         category: "Food Delivery",
         image: "food drone x3.jpg",
+        addedBy: "default",
       },
       {
         id: 9,
@@ -140,6 +149,7 @@ const App = () => {
         pricePerMonth: 2200,
         category: "Food Delivery",
         image: "food drone x4.jpg",
+        addedBy: "default",
       },
       {
         id: 10,
@@ -151,6 +161,7 @@ const App = () => {
         pricePerMonth: 2500,
         category: "Food Delivery",
         image: "food drone x5.jpg",
+        addedBy: "default",
       },
       {
         id: 11,
@@ -162,6 +173,7 @@ const App = () => {
         pricePerMonth: 1800,
         category: "Farming",
         image: "farming drone x1.jpg",
+        addedBy: "default",
       },
       {
         id: 12,
@@ -173,6 +185,7 @@ const App = () => {
         pricePerMonth: 2000,
         category: "Farming",
         image: "farming drone x2.jpg",
+        addedBy: "default",
       },
       {
         id: 13,
@@ -184,6 +197,7 @@ const App = () => {
         pricePerMonth: 2200,
         category: "Farming",
         image: "farming drone x3.jpg",
+        addedBy: "default",
       },
       {
         id: 14,
@@ -195,6 +209,7 @@ const App = () => {
         pricePerMonth: 2500,
         category: "Farming",
         image: "farming drone x4.jpg",
+        addedBy: "default",
       },
       {
         id: 15,
@@ -206,10 +221,48 @@ const App = () => {
         pricePerMonth: 3000,
         category: "Farming",
         image: "farming drone x5.jpg",
+        addedBy: "default",
       },
     ];
-    setProducts(productList);
+
+    // Load products from local storage
+    const storedProducts = JSON.parse(localStorage.getItem("products")) || [];
+
+    // Merge default products with stored products, avoiding duplicates
+    const mergedProducts = [...defaultProducts, ...storedProducts.filter(
+      (storedProduct) => !defaultProducts.some(
+        (defaultProduct) => defaultProduct.id === storedProduct.id
+      )
+    )];
+
+    setProducts(mergedProducts);
   }, []);
+
+  useEffect(() => {
+    // Store products in local storage whenever they change
+    localStorage.setItem("products", JSON.stringify(products));
+  }, [products]);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
+      const currentUser = storedUsers.find(
+        (user) => user.email === auth.currentUser.email
+      );
+      if (currentUser) {
+        setCurrentUserEmail(currentUser.email);
+        const storedCartItems = JSON.parse(localStorage.getItem(`cartItems_${currentUser.email}`)) || [];
+        setCartItems(storedCartItems);
+      }
+    }
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      localStorage.setItem(`cartItems_${currentUserEmail}`, JSON.stringify(cartItems));
+    }
+  }, [cartItems, isLoggedIn, currentUserEmail]);
+
   return (
     <Router>
       <ScrollToTop />
@@ -222,6 +275,7 @@ const App = () => {
           cartItems={cartItems}
           setSearchTerm={setSearchTerm}
           products={products}
+          currentUserEmail={currentUserEmail}
         />
 
         {/* Main Content */}
@@ -237,6 +291,7 @@ const App = () => {
                   cartItems={cartItems}
                   products={products}
                   searchTerm={searchTerm}
+                  currentUserEmail={currentUserEmail}
                 />
               }
             />
@@ -263,6 +318,7 @@ const App = () => {
                     setCartItems={setCartItems}
                     cartItems={cartItems}
                     products={products}
+                    currentUserEmail={currentUserEmail}
                   />
                 ) : (
                   <Navigate to="/login" />
@@ -279,6 +335,7 @@ const App = () => {
                     products={products}
                     setProducts={setProducts}
                     currentAdmin={currentAdmin}
+                    currentUserEmail={currentUserEmail}
                   />
                 ) : (
                   <Navigate to="/login" />
@@ -291,18 +348,21 @@ const App = () => {
               path="/cart"
               element={
                 isLoggedIn ? (
-                  <CartPage cartItems={cartItems} setCartItems={setCartItems} />
+                  <CartPage
+                    cartItems={cartItems}
+                    setCartItems={setCartItems}
+                    currentUserEmail={currentUserEmail}
+                  />
                 ) : (
                   <Navigate to="/login" />
                 )
               }
             />
 
-
             {/* Payment Page */}
             <Route
               path="/payment"
-              element={isLoggedIn ? <PaymentPage /> : <Navigate to="/login" />}
+              element={isLoggedIn ? <PaymentPage currentUserEmail={currentUserEmail} /> : <Navigate to="/login" />}
             />
 
             {/* Product Details Page */}
@@ -314,7 +374,13 @@ const App = () => {
             {/* My Orders Page */}
             <Route
               path="/my-orders"
-              element={isLoggedIn ? <MyOrdersPage /> : <Navigate to="/login" />}
+              element={
+                isLoggedIn ? (
+                  <MyOrdersPage currentUserEmail={currentUserEmail} />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
             />
 
             {/* Redirect Unknown Routes to Home */}

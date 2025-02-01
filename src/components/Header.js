@@ -47,7 +47,7 @@ const Header = ({
         setUserDetails(currentUser);
       }
 
-      const storedOrders = JSON.parse(localStorage.getItem("orders")) || [];
+      const storedOrders = JSON.parse(localStorage.getItem(`orders_${auth.currentUser.email}`)) || [];
       const userOrders = storedOrders.filter(
         (order) => order.userEmail === auth.currentUser.email
       );
@@ -179,7 +179,9 @@ const Header = ({
           className="h-12 w-12 mr-2 rounded-full object-cover border-2 border-white"
         />
         {!menuOpen && (
-          <h1 className="text-xl font-bold text-white">Drone Delivery Service</h1>
+          <h1 className="text-xl font-bold text-white">
+            Drone Delivery Service
+          </h1>
         )}
       </div>
 

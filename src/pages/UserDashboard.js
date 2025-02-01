@@ -7,14 +7,15 @@ const UserDashboard = ({
   setCartItems,
   cartItems,
   products,
+  currentUserEmail,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedCartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+    const storedCartItems = JSON.parse(localStorage.getItem(`cartItems_${currentUserEmail}`)) || [];
     setCartItems(storedCartItems);
-  }, [setCartItems]);
+  }, [setCartItems, currentUserEmail]);
 
   const handleAddToCart = (product) => {
     const existingCartItem = cartItems.find((item) => item.id === product.id);
@@ -36,7 +37,7 @@ const UserDashboard = ({
       ];
     }
     setCartItems(updatedCartItems);
-    localStorage.setItem("cartItems", JSON.stringify(updatedCartItems)); // Store cart items in local storage
+    localStorage.setItem(`cartItems_${currentUserEmail}`, JSON.stringify(updatedCartItems)); // Store cart items in local storage
     alert(`Added ${product.name} to cart!`);
   };
 

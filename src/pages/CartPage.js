@@ -1,16 +1,16 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-const CartPage = ({ cartItems, setCartItems }) => {
+const CartPage = ({ cartItems, setCartItems, currentUserEmail }) => {
   const navigate = useNavigate();
 
   const getStoredCartItems = () => {
-    const storedItems = localStorage.getItem("cartItems");
+    const storedItems = localStorage.getItem(`cartItems_${currentUserEmail}`);
     return storedItems ? JSON.parse(storedItems) : [];
   };
 
   const storeCartItems = (items) => {
-    localStorage.setItem("cartItems", JSON.stringify(items));
+    localStorage.setItem(`cartItems_${currentUserEmail}`, JSON.stringify(items));
   };
 
   useEffect(() => {
@@ -18,11 +18,11 @@ const CartPage = ({ cartItems, setCartItems }) => {
     if (storedItems.length > 0) {
       setCartItems(storedItems);
     }
-  }, [setCartItems]);
+  }, [setCartItems, currentUserEmail]);
 
   useEffect(() => {
     storeCartItems(cartItems);
-  }, [cartItems]);
+  }, [cartItems, currentUserEmail]);
 
   const handleRemoveItem = (itemId) => {
     setCartItems(cartItems.filter((item) => item.id !== itemId));
@@ -57,7 +57,6 @@ const CartPage = ({ cartItems, setCartItems }) => {
   const handleViewDetails = (product) => {
     navigate(`/product/${product.id}`, { state: { product } });
   };
-  
 
   const totalAmount = cartItems.reduce((total, item) => total + Number(item.totalPrice), 0);
   const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
@@ -80,8 +79,8 @@ const CartPage = ({ cartItems, setCartItems }) => {
     <div className="min-h-screen bg-gradient-to-r from-blue-50 to-purple-50 p-6">
       <div className="max-w-4xl mx-auto">
         {/* Header Section */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
+        <div className="flex flex-col md:flex-row justify-between items-center mb-8">
+          <div className="mb-4 md:mb-0">
             <button
               onClick={() => navigate(-1)}
               className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors duration-300 mr-2"
@@ -107,7 +106,7 @@ const CartPage = ({ cartItems, setCartItems }) => {
           {cartItems.map((item) => (
             <div
               key={item.id}
-              className="p-6 bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex"
+              className="p-6 bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col md:flex-row"
               onClick={() => handleViewDetails(item)}
             >
               <img
@@ -117,7 +116,7 @@ const CartPage = ({ cartItems, setCartItems }) => {
                     : `${process.env.PUBLIC_URL}/${item.image}`
                 }
                 alt={item.name}
-                className="w-32 h-32 object-cover rounded-lg mr-4"
+                className="w-full md:w-32 h-32 object-cover rounded-lg mb-4 md:mb-0 md:mr-4"
               />
               <div className="flex-grow">
                 <h3 className="text-lg font-semibold text-gray-800">{item.name}</h3>
@@ -158,8 +157,6 @@ const CartPage = ({ cartItems, setCartItems }) => {
             </div>
           ))}
         </div>
-
-       
       </div>
     </div>
   );

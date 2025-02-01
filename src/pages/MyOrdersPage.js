@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const MyOrdersPage = () => {
+const MyOrdersPage = ({ currentUserEmail }) => {
   const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedOrders = JSON.parse(localStorage.getItem("orders")) || [];
+    const storedOrders = JSON.parse(localStorage.getItem(`orders_${currentUserEmail}`)) || [];
     setOrders(storedOrders);
-  }, []);
+  }, [currentUserEmail]);
 
   const handleCancelOrder = (orderId) => {
     const updatedOrders = orders.filter((order) => order.id !== orderId);
     setOrders(updatedOrders);
-    localStorage.setItem("orders", JSON.stringify(updatedOrders));
+    localStorage.setItem(`orders_${currentUserEmail}`, JSON.stringify(updatedOrders));
     alert("Order cancelled successfully.");
   };
 

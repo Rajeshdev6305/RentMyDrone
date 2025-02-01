@@ -7,15 +7,18 @@ const MainBody = ({
   cartItems,
   products,
   searchTerm,
+  currentUserEmail,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const navigate = useNavigate();
 
   // Load cart items from localStorage on component mount
   useEffect(() => {
-    const storedCartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
-    setCartItems(storedCartItems);
-  }, [setCartItems]);
+    if (isLoggedIn) {
+      const storedCartItems = JSON.parse(localStorage.getItem(`cartItems_${currentUserEmail}`)) || [];
+      setCartItems(storedCartItems);
+    }
+  }, [setCartItems, currentUserEmail, isLoggedIn]);
 
   // Handle category change
   const handleCategoryChange = (category) => {
@@ -50,7 +53,7 @@ const MainBody = ({
       ];
     }
     setCartItems(updatedCartItems);
-    localStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
+    localStorage.setItem(`cartItems_${currentUserEmail}`, JSON.stringify(updatedCartItems));
     alert(`Added ${product.name} to cart!`);
   };
 

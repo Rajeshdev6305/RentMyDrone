@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-const PaymentPage = () => {
+const PaymentPage = ({ currentUserEmail }) => { // Add currentUserEmail as a prop
   const [paymentDetails, setPaymentDetails] = useState({
     cardNumber: "",
     cardHolderName: "",
@@ -57,11 +57,12 @@ const PaymentPage = () => {
       startDate,
       endDate,
       paymentStatus: "Paid",
+      userEmail: currentUserEmail, // Add user email to order
     };
 
-    const existingOrders = JSON.parse(localStorage.getItem("orders")) || [];
+    const existingOrders = JSON.parse(localStorage.getItem(`orders_${currentUserEmail}`)) || [];
     existingOrders.push(newOrder);
-    localStorage.setItem("orders", JSON.stringify(existingOrders));
+    localStorage.setItem(`orders_${currentUserEmail}`, JSON.stringify(existingOrders));
 
     // Empty all inputs
     setPaymentDetails({
