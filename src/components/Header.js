@@ -173,7 +173,7 @@ const Header = ({
         />
         {!menuOpen && (
           <h1 className="text-xl font-bold text-white">
-            Drone Delivery Service
+            RentMyDrone
           </h1>
         )}
       </div>

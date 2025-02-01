@@ -86,7 +86,7 @@ const LoginPage = ({ setIsLoggedIn, setUserType }) => {
       <div className="w-full md:w-1/2 lg:w-2/5 flex justify-center items-center p-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4 text-blue-800">
-            Drone Delivery Service
+            RentMyDrone
           </h1>
           <p className="text-lg mb-6 text-gray-700">
             Experience fast and reliable delivery powered by drones. Login to track your orders and more.

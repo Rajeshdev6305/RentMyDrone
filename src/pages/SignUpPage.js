@@ -97,7 +97,7 @@ const SignUpPage = () => {
       <div className="w-full md:w-2/3 lg:w-1/2 flex justify-center items-center text-center p-4 mb-6 md:mb-0">
         <div>
           <h1 className="text-3xl font-bold mb-4 text-blue-600">
-            Drone Delivery Service
+            RentMyDrone
           </h1>
           <p className="text-lg mb-6 text-gray-700">
             Sign up to experience fast and reliable drone-powered delivery. Manage your account and track deliveries easily!

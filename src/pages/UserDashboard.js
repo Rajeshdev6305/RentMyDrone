@@ -104,7 +104,7 @@ const UserDashboard = ({
       {/* Dashboard Content */}
       <div className="px-4 py-6">
         <header className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold">User Dashboard</h1>
+          <h1 className="text-2xl font-bold">RentMyDrone</h1>
         </header>
 
         {/* Category Buttons */}
