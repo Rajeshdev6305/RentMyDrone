@@ -25,11 +25,11 @@ const CartPage = ({ cartItems, setCartItems, currentUserEmail }) => {
       }
     }
     setLoading(false); // Set loading to false after cart items are loaded
-  }, [setCartItems, currentUserEmail, getStoredCartItems]);
+  }, [setCartItems, currentUserEmail]);
 
   useEffect(() => {
     storeCartItems(cartItems);
-  }, [cartItems, currentUserEmail, storeCartItems]);
+  }, [cartItems, currentUserEmail]);
 
   const handleRemoveItem = (itemId) => {
     setCartItems(cartItems.filter((item) => item.id !== itemId));
@@ -94,11 +94,11 @@ const CartPage = ({ cartItems, setCartItems, currentUserEmail }) => {
     <div className="min-h-screen bg-gradient-to-r from-blue-50 to-purple-50 p-6">
       <div className="max-w-4xl mx-auto">
         {/* Header Section */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
+        <div className="flex flex-col md:flex-row justify-between items-center mb-8">
+          <div className="flex space-x-2 mb-4 md:mb-0">
             <button
-              onClick={() => navigate(-1)}
-              className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors duration-300 mr-2"
+              onClick={() => navigate("/user-dashboard")}
+              className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors duration-300"
             >
               Back
             </button>
@@ -121,7 +121,7 @@ const CartPage = ({ cartItems, setCartItems, currentUserEmail }) => {
           {cartItems.map((item) => (
             <div
               key={item.id}
-              className="p-6 bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex"
+              className="p-6 bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col md:flex-row"
               onClick={() => handleViewDetails(item)}
             >
               <img
@@ -131,7 +131,7 @@ const CartPage = ({ cartItems, setCartItems, currentUserEmail }) => {
                     : `${process.env.PUBLIC_URL}/${item.image}`
                 }
                 alt={item.name}
-                className="w-32 h-32 object-cover rounded-lg mr-4"
+                className="w-full md:w-32 h-32 object-cover rounded-lg mb-4 md:mb-0 md:mr-4"
               />
               <div className="flex-grow">
                 <h3 className="text-lg font-semibold text-gray-800">{item.name}</h3>
@@ -139,7 +139,7 @@ const CartPage = ({ cartItems, setCartItems, currentUserEmail }) => {
                 <p className="text-sm text-gray-600">Category: {item.category}</p>
                 <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
                 <p className="text-sm text-gray-600">Total Price: ${item.totalPrice.toFixed(2)}</p>
-                <div className="flex items-center space-x-2 mt-2">
+                <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-2 mt-2">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
