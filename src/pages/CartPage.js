@@ -25,33 +25,36 @@ const CartPage = ({ cartItems, setCartItems, currentUserEmail }) => {
   }, [cartItems, currentUserEmail]);
 
   const handleRemoveItem = (itemId) => {
-    setCartItems(cartItems.filter((item) => item.id !== itemId));
+    const updatedCartItems = cartItems.filter((item) => item.id !== itemId);
+    setCartItems(updatedCartItems);
+    storeCartItems(updatedCartItems);
     alert("Item removed from cart.");
   };
 
   const handleRemoveAll = () => {
     setCartItems([]);
+    storeCartItems([]);
     alert("All items removed from cart.");
   };
 
   const handleIncreaseQuantity = (itemId) => {
-    setCartItems(
-      cartItems.map((item) =>
-        item.id === itemId
-          ? { ...item, quantity: item.quantity + 1, totalPrice: item.totalPrice + Number(item.pricePerDay) }
-          : item
-      )
+    const updatedCartItems = cartItems.map((item) =>
+      item.id === itemId
+        ? { ...item, quantity: item.quantity + 1, totalPrice: item.totalPrice + Number(item.pricePerDay) }
+        : item
     );
+    setCartItems(updatedCartItems);
+    storeCartItems(updatedCartItems);
   };
 
   const handleDecreaseQuantity = (itemId) => {
-    setCartItems(
-      cartItems.map((item) =>
-        item.id === itemId && item.quantity > 1
-          ? { ...item, quantity: item.quantity - 1, totalPrice: item.totalPrice - Number(item.pricePerDay) }
-          : item
-      )
+    const updatedCartItems = cartItems.map((item) =>
+      item.id === itemId && item.quantity > 1
+        ? { ...item, quantity: item.quantity - 1, totalPrice: item.totalPrice - Number(item.pricePerDay) }
+        : item
     );
+    setCartItems(updatedCartItems);
+    storeCartItems(updatedCartItems);
   };
 
   const handleViewDetails = (product) => {
