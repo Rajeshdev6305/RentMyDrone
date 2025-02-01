@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaSignOutAlt, FaCartPlus, FaInfoCircle } from "react-icons/fa";
+import Swal from 'sweetalert2'; // Import SweetAlert2
 
 const UserDashboard = ({
   setIsLoggedIn,
@@ -10,11 +11,13 @@ const UserDashboard = ({
   currentUserEmail,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [loading, setLoading] = useState(true); // Add loading state
   const navigate = useNavigate();
 
   useEffect(() => {
     const storedCartItems = JSON.parse(localStorage.getItem(`cartItems_${currentUserEmail}`)) || [];
     setCartItems(storedCartItems);
+    setLoading(false); // Set loading to false after data is loaded
   }, [setCartItems, currentUserEmail]);
 
   const handleAddToCart = (product) => {
@@ -38,11 +41,11 @@ const UserDashboard = ({
     }
     setCartItems(updatedCartItems);
     localStorage.setItem(`cartItems_${currentUserEmail}`, JSON.stringify(updatedCartItems)); // Store cart items in local storage
-    alert(`Added ${product.name} to cart!`);
+    Swal.fire('Success', `Added ${product.name} to cart!`, 'success');
   };
 
   const handleViewDetails = (product) => {
-    navigate(`/product/${product.id}`, { state: { product } });
+    navigate(`/product/${product.id}`, { state: { product, currentUserEmail } });
   };
 
   const handleLogout = () => {
@@ -73,6 +76,15 @@ const UserDashboard = ({
     "Food Delivery": "Fast, efficient, and reliable food delivery drones.",
     Farming: "Smart drones to help in your farming operations.",
   };
+
+  
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative">

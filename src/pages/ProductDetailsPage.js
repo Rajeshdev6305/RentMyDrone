@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaCartPlus, FaStar } from "react-icons/fa";
+import Swal from 'sweetalert2'; // Import SweetAlert2
 
 const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => {
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true); // Add loading state
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [bookingType, setBookingType] = useState("day"); // Default to day
   const [bookingDuration, setBookingDuration] = useState(1);
@@ -16,12 +18,14 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
   const [startHour, setStartHour] = useState(""); // New state for start hour
   const [endHour, setEndHour] = useState(""); // New state for end hour
   const [product, setProduct] = useState(null);
+  const currentUserEmail = location.state?.currentUserEmail;
 
   useEffect(() => {
     const prod =
       location.state?.product ||
       products.find((product) => product.id === parseInt(id));
     setProduct(prod);
+    setLoading(false); // Set loading to false after product is loaded
   }, [id, location.state, products]);
 
   useEffect(() => {
@@ -39,6 +43,14 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
     }
   }, [bookingType, bookingDuration, quantity, product]);
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
   if (!product) {
     return <p>No product details available!</p>;
   }
@@ -50,12 +62,12 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
       !endDate ||
       (bookingType === "hour" && (!startHour || !endHour))
     ) {
-      alert("Please fill in all required details.");
+      Swal.fire('Error', 'Please fill in all required details.', 'error');
       return;
     }
 
     if (!product) {
-      alert("Product details are not available.");
+      Swal.fire('Error', 'Product details are not available.', 'error');
       return;
     }
 
@@ -70,7 +82,7 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
     });
 
     if (isBooked) {
-      alert("This product is already booked for the selected dates.");
+      Swal.fire('Error', 'This product is already booked for the selected dates.', 'error');
       return;
     }
 
@@ -86,6 +98,7 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
         endDate,
         startHour: bookingType === "hour" ? startHour : null,
         endHour: bookingType === "hour" ? endHour : null,
+        currentUserEmail, // Pass currentUserEmail to PaymentPage
       },
     });
   };

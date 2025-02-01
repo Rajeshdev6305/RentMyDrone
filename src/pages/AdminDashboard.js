@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
+import Swal from 'sweetalert2'; // Import SweetAlert2
 
 const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
   const [formData, setFormData] = useState({
@@ -26,12 +27,14 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
   const [editingProduct, setEditingProduct] = useState(null);
   const [viewMyProducts, setViewMyProducts] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Add loading state
   const imageInputRef = useRef(null);
   const formRef = useRef(null);
 
   useEffect(() => {
     const storedProducts = JSON.parse(localStorage.getItem("products")) || [];
     setProducts(storedProducts);
+    setLoading(false); // Set loading to false after products are loaded
   }, [setProducts]);
 
   useEffect(() => {
@@ -64,7 +67,7 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
         );
         setProducts(updatedProducts);
         setEditingProduct(null);
-        alert("Product updated successfully!");
+        Swal.fire('Success', 'Product updated successfully!', 'success');
       } else {
         const newProduct = {
           id: Date.now(),
@@ -75,7 +78,7 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
           a.category.localeCompare(b.category)
         );
         setProducts(updatedProducts);
-        alert("Product added successfully!");
+        Swal.fire('Success', 'Product added successfully!', 'success');
       }
       setFormData({
         name: "",
@@ -105,7 +108,7 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
 
   const handleEditProduct = (product) => {
     if (product.addedBy !== currentAdmin) {
-      alert("You can only edit products that you added.");
+      Swal.fire('Error', 'You can only edit products that you added.', 'error');
       return;
     }
     setEditingProduct(product);
@@ -117,14 +120,14 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
   const handleDeleteProduct = (productId) => {
     const productToDelete = products.find((product) => product.id === productId);
     if (productToDelete.addedBy !== currentAdmin) {
-      alert("You can only delete products that you added.");
+      Swal.fire('Error', 'You can only delete products that you added.', 'error');
       return;
     }
     const updatedProducts = products.filter(
       (product) => product.id !== productId
     );
     setProducts(updatedProducts);
-    alert("Product deleted successfully!");
+    Swal.fire('Success', 'Product deleted successfully!', 'success');
   };
 
   const groupedProducts = products.reduce((acc, product) => {
@@ -138,6 +141,14 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
   const filteredProducts = viewMyProducts
     ? products.filter((product) => product.addedBy === currentAdmin)
     : products;
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">

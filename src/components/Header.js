@@ -38,7 +38,7 @@ const Header = ({
   }, [cartItems]);
 
   useEffect(() => {
-    if (isLoggedIn) {
+    if (isLoggedIn && auth.currentUser) {
       const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
       const currentUser = storedUsers.find(
         (user) => user.email === auth.currentUser.email
@@ -117,11 +117,13 @@ const Header = ({
 
   const handleCartClick = () => {
     navigate("/cart");
+    window.scrollTo({ top: 0, behavior: "smooth" }); // Scroll to top
     setMenuOpen(false);
   };
 
   const handleOrdersClick = () => {
     navigate("/my-orders");
+    window.scrollTo({ top: 0, behavior: "smooth" }); // Scroll to top
     setMenuOpen(false);
   };
 

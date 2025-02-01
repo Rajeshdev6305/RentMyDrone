@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../Authentication/firebaseConfig"; // Replace with the correct path to your Firebase config
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import Swal from 'sweetalert2'; // Import SweetAlert2
 
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
@@ -12,6 +13,7 @@ const SignUpPage = () => {
     password: "",
     confirmPassword: "",
   });
+  const [loading, setLoading] = useState(false); // Add loading state
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -20,9 +22,11 @@ const SignUpPage = () => {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
+    setLoading(true); // Set loading to true during sign-up
 
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
+      Swal.fire('Error', 'Passwords do not match!', 'error');
+      setLoading(false); // Set loading to false if passwords do not match
       return;
     }
 
@@ -44,7 +48,8 @@ const SignUpPage = () => {
       );
 
       if (existingUser) {
-        alert("User with this email already exists.");
+        Swal.fire('Error', 'User with this email already exists.', 'error');
+        setLoading(false); // Set loading to false if user already exists
         return;
       }
 
@@ -60,11 +65,13 @@ const SignUpPage = () => {
       storedUsers.push(newUser);
       localStorage.setItem("users", JSON.stringify(storedUsers));
 
-      alert("Account created successfully!");
+      Swal.fire('Success', 'Account created successfully!', 'success');
       navigate("/login");
     } catch (error) {
       console.error("Error during sign-up:", error.message);
-      alert("Error occurred during sign-up. Please try again.");
+      Swal.fire('Error', 'Error occurred during sign-up. Please try again.', 'error');
+    } finally {
+      setLoading(false); // Set loading to false after sign-up is complete
     }
   };
 
@@ -107,70 +114,76 @@ const SignUpPage = () => {
       <div className="w-full md:w-1/2 lg:w-1/3 p-4 flex justify-center items-center bg-gray-100">
         <div className="p-6 max-w-md bg-white rounded-lg shadow-xl w-full transition-shadow duration-300 hover:shadow-2xl">
           <h2 className="text-xl font-bold mb-4 text-center">Sign Up</h2>
-          <form onSubmit={handleSignUp} className="space-y-4">
-            <select
-              name="type"
-              value={formData.type}
-              onChange={handleChange}
-              className="w-full p-2 border transition-all duration-300 hover:border-blue-500"
-              required
-            >
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
-            </select>
+          {loading ? (
+            <div className="flex justify-center items-center">
+              <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
+            </div>
+          ) : (
+            <form onSubmit={handleSignUp} className="space-y-4">
+              <select
+                name="type"
+                value={formData.type}
+                onChange={handleChange}
+                className="w-full p-2 border transition-all duration-300 hover:border-blue-500"
+                required
+              >
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+              </select>
 
-            <input
-              type="text"
-              name="username"
-              placeholder={placeholders[formData.type].username}
-              value={formData.username}
-              onChange={handleChange}
-              className="w-full p-2 border transition-all duration-300 hover:border-blue-500"
-              required
-            />
-            <input
-              type="email"
-              name="email"
-              placeholder={placeholders[formData.type].email}
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full p-2 border transition-all duration-300 hover:border-blue-500"
-              required
-            />
-            <input
-              type="text"
-              name="phone"
-              placeholder={placeholders[formData.type].phone}
-              value={formData.phone}
-              onChange={handleChange}
-              className="w-full p-2 border transition-all duration-300 hover:border-blue-500"
-              required
-            />
-            <input
-              type="password"
-              name="password"
-              placeholder={placeholders[formData.type].password}
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full p-2 border transition-all duration-300 hover:border-blue-500"
-              required
-            />
-            <input
-              type="password"
-              name="confirmPassword"
-              placeholder={placeholders[formData.type].password}
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              className="w-full p-2 border transition-all duration-300 hover:border-blue-500"
-              required
-            />
-            <button
-              type="submit"
-              className="w-full bg-blue-600 text-white px-4 py-2 rounded transition-all duration-300 hover:bg-blue-700"
-            >
-              Sign Up
-            </button>
-          </form>
+              <input
+                type="text"
+                name="username"
+                placeholder={placeholders[formData.type].username}
+                value={formData.username}
+                onChange={handleChange}
+                className="w-full p-2 border transition-all duration-300 hover:border-blue-500"
+                required
+              />
+              <input
+                type="email"
+                name="email"
+                placeholder={placeholders[formData.type].email}
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full p-2 border transition-all duration-300 hover:border-blue-500"
+                required
+              />
+              <input
+                type="text"
+                name="phone"
+                placeholder={placeholders[formData.type].phone}
+                value={formData.phone}
+                onChange={handleChange}
+                className="w-full p-2 border transition-all duration-300 hover:border-blue-500"
+                required
+              />
+              <input
+                type="password"
+                name="password"
+                placeholder={placeholders[formData.type].password}
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full p-2 border transition-all duration-300 hover:border-blue-500"
+                required
+              />
+              <input
+                type="password"
+                name="confirmPassword"
+                placeholder={placeholders[formData.type].password}
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                className="w-full p-2 border transition-all duration-300 hover:border-blue-500"
+                required
+              />
+              <button
+                type="submit"
+                className="w-full bg-blue-600 text-white px-4 py-2 rounded transition-all duration-300 hover:bg-blue-700"
+              >
+                Sign Up
+              </button>
+            </form>
+          )}
           <p className="text-sm mt-4 text-center">
             Already have an account?{" "}
             <a href="/login" className="text-blue-600">

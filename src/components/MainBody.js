@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Swal from 'sweetalert2'; // Import SweetAlert2
 
 const MainBody = ({
   isLoggedIn,
@@ -10,6 +11,7 @@ const MainBody = ({
   currentUserEmail,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [loading, setLoading] = useState(true); // Add loading state
   const navigate = useNavigate();
 
   // Load cart items from localStorage on component mount
@@ -18,6 +20,7 @@ const MainBody = ({
       const storedCartItems = JSON.parse(localStorage.getItem(`cartItems_${currentUserEmail}`)) || [];
       setCartItems(storedCartItems);
     }
+    setLoading(false); // Set loading to false after cart items are loaded
   }, [setCartItems, currentUserEmail, isLoggedIn]);
 
   // Handle category change
@@ -54,13 +57,13 @@ const MainBody = ({
     }
     setCartItems(updatedCartItems);
     localStorage.setItem(`cartItems_${currentUserEmail}`, JSON.stringify(updatedCartItems));
-    alert(`Added ${product.name} to cart!`);
+    Swal.fire('Success', `Added ${product.name} to cart!`, 'success');
   };
 
   // View product details
   const handleViewDetails = (product) => {
     if (!isLoggedIn) {
-      alert("Please log in to view product details.");
+      Swal.fire('Error', 'Please log in to view product details.', 'error');
       navigate("/login");
     } else {
       navigate(`/product/${product.id}`, { state: { product } });
@@ -94,6 +97,14 @@ const MainBody = ({
       "https://files.oaiusercontent.com/file-KP9VxT7U6L8tYKUMtqZzme?se=2025-01-30T22%3A03%3A09Z&sp=r&sv=2024-08-04&sr=b&rscc=max-age%3D604800%2C%20immutable%2C%20private&rscd=attachment%3B%20filename%3D89ca11ab-6624-4b3e-8f70-d62dc06414f2.webp&sig=e/2ppHcUf%2Bcs/ADlyPHgf370VXWBxjQanvnJ%2BwjSPIA%3D",
     Farming: "https://img.freepik.com/premium-photo/drone-spraying-crops-sunrise_718046-8379.jpg",
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-50 min-h-screen">
