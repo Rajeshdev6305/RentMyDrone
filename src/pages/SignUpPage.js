@@ -37,8 +37,6 @@ const SignUpPage = () => {
         formData.password
       );
 
-      // const user = userCredential.user; // Remove this line if not used
-
       // Retrieve existing users from local storage
       const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
 
