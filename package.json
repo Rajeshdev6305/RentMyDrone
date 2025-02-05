@@ -1,10 +1,9 @@
 {
-  "homepage": "https://github.com/Rajeshdev6305/RentMyDrone.git/.'",
+  "homepage": ".",
   "name": "RentMyDrone",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "18": "^0.0.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/material": "^6.3.0",
