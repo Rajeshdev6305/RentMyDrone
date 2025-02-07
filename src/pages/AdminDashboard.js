@@ -302,7 +302,7 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
                       {product.description}
                     </p>
                     <p className="text-lg font-bold text-blue-600">
-                      ${product.pricePerDay} per day
+                      ₹{product.pricePerDay} per day
                     </p>
                     <p className="text-xs text-gray-500">{product.category}</p>
                     {product.addedBy === currentAdmin && (

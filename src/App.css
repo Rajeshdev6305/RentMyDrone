@@ -46,3 +46,7 @@ nav button.active {
   border-bottom: 2px solid white; /* Active section gets a thicker border */
 }
 
+.main-content {
+  padding-top: 81px; /* Adjust this value based on the height of your header */
+}
+

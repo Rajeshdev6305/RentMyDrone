@@ -200,17 +200,17 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
           <div className="flex items-center mb-2">
             {bookingType === "day" && (
               <p className="text-sm text-blue-600 font-bold">
-                ${product.pricePerDay} per day
+                ₹{product.pricePerDay} per day
               </p>
             )}
             {bookingType === "month" && (
               <p className="text-sm text-blue-600 font-bold">
-                ${product.pricePerMonth} per month
+                ₹{product.pricePerMonth} per month
               </p>
             )}
             {bookingType === "hour" && (
               <p className="text-sm text-blue-600 font-bold">
-                ${product.pricePerHour} per hour
+                ₹{product.pricePerHour} per hour
               </p>
             )}
           </div>
@@ -329,7 +329,7 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
       )}
 
       <div className="mt-4">
-        <p className="text-lg font-bold">Total Price: ${totalPrice}</p>
+        <p className="text-lg font-bold">Total Price: ₹{totalPrice}</p>
       </div>
 
       <div className="mt-6 flex justify-between items-center">

@@ -48,8 +48,8 @@ const Footer = () => {
               <span>Contact Us</span>
             </h4>
             <p>Email: support@dronecompany.com</p>
-            <p>Phone: +1 (123) 456-7890</p>
-            <p>Address: 123 Drone Street, City, Country</p>
+            <p>Phone: +91 98765 43210</p>
+            <p>Address: 123 Drone Street, Bengaluru, Karnataka, India</p>
           </div>
         </div>
 

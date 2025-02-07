@@ -113,13 +113,17 @@ const PaymentPage = ({ currentUserEmail }) => { // Add currentUserEmail as a pro
             <div className="mb-4">
               <h3 className="text-xl font-semibold">{product.name}</h3>
               <p className="text-sm text-blue-600 font-bold mb-2">
-                {bookingType === "hour" && `$${product.pricePerHour} per hour`}
-                {bookingType === "day" && `$${product.pricePerDay} per day`}
-                {bookingType === "month" && `$${product.pricePerMonth} per month`}
+                ₹{product.pricePerHour} per hour
+              </p>
+              <p className="text-sm text-blue-600 font-bold mb-2">
+                ₹{product.pricePerDay} per day
+              </p>
+              <p className="text-sm text-blue-600 font-bold mb-2">
+                ₹{product.pricePerMonth} per month
               </p>
               <p>Booking Duration: {bookingDuration} {bookingType}(s)</p>
               <p>Quantity: {quantity}</p>
-              <p className="font-semibold">Total Price: ${totalAmount}</p>
+              <p className="font-semibold">Total Price: ₹{totalAmount}</p>
             </div>
 
             {/* Payment Method Selection */}

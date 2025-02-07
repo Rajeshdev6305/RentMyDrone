@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Swal from 'sweetalert2'; // Import SweetAlert2
+import Swal from "sweetalert2"; // Import SweetAlert2
 
 const MainBody = ({
   isLoggedIn,
@@ -17,7 +17,8 @@ const MainBody = ({
   // Load cart items from localStorage on component mount
   useEffect(() => {
     if (isLoggedIn) {
-      const storedCartItems = JSON.parse(localStorage.getItem(`cartItems_${currentUserEmail}`)) || [];
+      const storedCartItems =
+        JSON.parse(localStorage.getItem(`cartItems_${currentUserEmail}`)) || [];
       setCartItems(storedCartItems);
     }
     setLoading(false); // Set loading to false after cart items are loaded
@@ -37,6 +38,11 @@ const MainBody = ({
 
   // Add product to cart
   const handleAddToCart = (product) => {
+    if (!isLoggedIn) {
+      Swal.fire('Error', 'Please log in to add items to the cart.', 'error');
+      navigate("/login");
+      return;
+    }
     const existingCartItem = cartItems.find((item) => item.id === product.id);
     let updatedCartItems;
     if (existingCartItem) {
@@ -56,14 +62,17 @@ const MainBody = ({
       ];
     }
     setCartItems(updatedCartItems);
-    localStorage.setItem(`cartItems_${currentUserEmail}`, JSON.stringify(updatedCartItems));
-    Swal.fire('Success', `Added ${product.name} to cart!`, 'success');
+    localStorage.setItem(
+      `cartItems_${currentUserEmail}`,
+      JSON.stringify(updatedCartItems)
+    );
+    Swal.fire("Success", `Added ${product.name} to cart!`, "success");
   };
 
   // View product details
   const handleViewDetails = (product) => {
     if (!isLoggedIn) {
-      Swal.fire('Error', 'Please log in to view product details.', 'error');
+      Swal.fire("Error", "Please log in to view product details.", "error");
       navigate("/login");
     } else {
       navigate(`/product/${product.id}`, { state: { product } });
@@ -92,10 +101,12 @@ const MainBody = ({
 
   const categoryImages = {
     All: "https://img.freepik.com/premium-photo/drone-flying-modern-cityscape-sunset-ai-generated-image_548729-4502.jpg",
-    Marriage: "https://img.freepik.com/premium-photo/photo-drone-with-camera-remote-control-aerial-photography_933496-28343.jpg",
+    Marriage:
+      "https://img.freepik.com/premium-photo/photo-drone-with-camera-remote-control-aerial-photography_933496-28343.jpg",
     "Food Delivery":
-      "https://files.oaiusercontent.com/file-KP9VxT7U6L8tYKUMtqZzme?se=2025-01-30T22%3A03%3A09Z&sp=r&sv=2024-08-04&sr=b&rscc=max-age%3D604800%2C%20immutable%2C%20private&rscd=attachment%3B%20filename%3D89ca11ab-6624-4b3e-8f70-d62dc06414f2.webp&sig=e/2ppHcUf%2Bcs/ADlyPHgf370VXWBxjQanvnJ%2BwjSPIA%3D",
-    Farming: "https://img.freepik.com/premium-photo/drone-spraying-crops-sunrise_718046-8379.jpg",
+      "https://img.freepik.com/premium-photo/delivery-drone-flying-with-cityscape-background-generative-ai_175949-1134.jpg",
+    Farming:
+      "https://img.freepik.com/premium-photo/drone-spraying-crops-sunrise_718046-8379.jpg",
   };
 
   if (loading) {
@@ -126,7 +137,7 @@ const MainBody = ({
       </div>
 
       {/* Category Filters */}
-      <div className="flex justify-center space-x-4 py-8 bg-white shadow-sm">
+      <div className="flex justify-center space-x-4 py-8 px-1 bg-white shadow-sm">
         {["All", "Marriage", "Food Delivery", "Farming"].map((category) => (
           <button
             key={category}
@@ -135,7 +146,7 @@ const MainBody = ({
               selectedCategory === category
                 ? "bg-blue-600 text-white shadow-lg"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
+            } text-xs sm:text-sm`} // Adjust the font size for mobile (xs) and larger screens (sm)
           >
             {category}
           </button>
@@ -164,7 +175,7 @@ const MainBody = ({
                 {product.description}
               </p>
               <p className="text-blue-600 font-bold">
-                ${product.pricePerDay} per day
+                ₹{product.pricePerDay} per day
               </p>
               <p className="text-gray-500 text-xs mb-2">
                 Category: {product.category}

@@ -18,6 +18,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import MyOrdersPage from "./pages/MyOrdersPage";
 import { auth } from "./Authentication/firebaseConfig"; // Import auth from Firebase config
+import { onAuthStateChanged } from "firebase/auth"; // Import onAuthStateChanged from Firebase auth
 import "./index.css"; // Ensure Tailwind CSS is imported
 import "./App.css"; // Import App.css for custom styles
 
@@ -34,7 +35,7 @@ const ScrollToTop = () => {
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userType, setUserType] = useState(""); // Can be "user" or "admin"
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState([]); // Default to an empty array
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentUserEmail, setCurrentUserEmail] = useState("");
@@ -243,7 +244,30 @@ const App = () => {
   }, [products]);
 
   useEffect(() => {
-    if (isLoggedIn) {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsLoggedIn(true);
+        const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
+        const currentUser = storedUsers.find((u) => u.email === user.email);
+        if (currentUser) {
+          setUserType(currentUser.userType);
+          setCurrentUserEmail(currentUser.email);
+          const storedCartItems = JSON.parse(localStorage.getItem(`cartItems_${currentUser.email}`)) || [];
+          setCartItems(storedCartItems);
+        }
+      } else {
+        setIsLoggedIn(false);
+        setUserType("");
+        setCurrentUserEmail("");
+        setCartItems([]);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (isLoggedIn && auth.currentUser) {
       const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
       const currentUser = storedUsers.find(
         (user) => user.email === auth.currentUser.email
@@ -274,23 +298,19 @@ const App = () => {
           cartItems={cartItems}
           setSearchTerm={setSearchTerm}
           products={products}
-          currentUserEmail={currentUserEmail}
         />
 
-        {/* Main Content */}
-        <main className="flex-grow p-4 pt-24">
+        <main className="flex-grow main-content">
           <Routes>
-            {/* Home Page */}
+            {/* Main Body */}
             <Route
               path="/"
               element={
                 <MainBody
-                  isLoggedIn={isLoggedIn}
-                  setCartItems={setCartItems}
-                  cartItems={cartItems}
                   products={products}
                   searchTerm={searchTerm}
-                  currentUserEmail={currentUserEmail}
+                  setSearchTerm={setSearchTerm}
+                  setCartItems={setCartItems}
                 />
               }
             />
@@ -299,10 +319,14 @@ const App = () => {
             <Route
               path="/login"
               element={
-                <LoginPage
-                  setIsLoggedIn={setIsLoggedIn}
-                  setUserType={setUserType}
-                />
+                isLoggedIn ? (
+                  <Navigate to={userType === "admin" ? "/admin" : "/user-dashboard"} />
+                ) : (
+                  <LoginPage
+                    setIsLoggedIn={setIsLoggedIn}
+                    setUserType={setUserType}
+                  />
+                )
               }
             />
             <Route path="/signup" element={<Signup />} />

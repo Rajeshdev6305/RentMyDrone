@@ -1,19 +1,19 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth } from "../Authentication/firebaseConfig"; // Replace with the correct path to your Firebase config
+import { auth } from "../Authentication/firebaseConfig";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import Swal from 'sweetalert2'; // Import SweetAlert2
+import Swal from "sweetalert2";
 
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
-    type: "user", // Default to "user"
-    username: "",  
+    type: "user",
+    username: "",
     email: "",
     phone: "",
     password: "",
     confirmPassword: "",
   });
-  const [loading, setLoading] = useState(false); // Add loading state
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -22,11 +22,11 @@ const SignUpPage = () => {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-    setLoading(true); // Set loading to true during sign-up
+    setLoading(true);
 
     if (formData.password !== formData.confirmPassword) {
-      Swal.fire('Error', 'Passwords do not match!', 'error');
-      setLoading(false); // Set loading to false if passwords do not match
+      Swal.fire("Error", "Passwords do not match!", "error");
+      setLoading(false);
       return;
     }
 
@@ -37,21 +37,17 @@ const SignUpPage = () => {
         formData.password
       );
 
-      // Retrieve existing users from local storage
       const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
-
-      // Check if the email already exists
       const existingUser = storedUsers.find(
         (storedUser) => storedUser.email === formData.email
       );
 
       if (existingUser) {
-        Swal.fire('Error', 'User with this email already exists.', 'error');
-        setLoading(false); // Set loading to false if user already exists
+        Swal.fire("Error", "User with this email already exists.", "error");
+        setLoading(false);
         return;
       }
 
-      // Save new user data to local storage
       const newUser = {
         userType: formData.type,
         username: formData.username,
@@ -63,42 +59,43 @@ const SignUpPage = () => {
       storedUsers.push(newUser);
       localStorage.setItem("users", JSON.stringify(storedUsers));
 
-      Swal.fire('Success', 'Account created successfully!', 'success');
+      Swal.fire("Success", "Account created successfully!", "success");
       navigate("/login");
     } catch (error) {
       console.error("Error during sign-up:", error.message);
-      Swal.fire('Error', 'Error occurred during sign-up. Please try again.', 'error');
+      Swal.fire(
+        "Error",
+        "Error occurred during sign-up. Please try again.",
+        "error"
+      );
     } finally {
-      setLoading(false); // Set loading to false after sign-up is complete
+      setLoading(false);
     }
   };
 
-  // Dynamic placeholders based on the user type
   const placeholders = {
     user: {
-      username: "User",
-      email: "user@gmail.com",
-      phone: "1234567890",
-      password: "user1234",
+      username: "Username",
+      email: "Email",
+      phone: "Phone number",
+      password: "Password",
     },
     admin: {
-      username: "Admin",
-      email: "admin@gmail.com",
-      phone: "1234567890",
-      password: "admin1234",
+      username: "Username",
+      email: "Email",
+      phone: "Phone number",
+      password: "Password",
     },
   };
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen justify-evenly">
-      {/* Left Side Image and Text */}
       <div className="w-full md:w-2/3 lg:w-1/2 flex justify-center items-center text-center p-4 mb-6 md:mb-0">
         <div>
-          <h1 className="text-3xl font-bold mb-4 text-blue-600">
-            RentMyDrone
-          </h1>
+          <h1 className="text-3xl font-bold mb-4 text-blue-600">RentMyDrone</h1>
           <p className="text-lg mb-6 text-gray-700">
-            Sign up to experience fast and reliable drone-powered delivery. Manage your account and track deliveries easily!
+            Sign up to experience fast and reliable drone-powered delivery.
+            Manage your account and track deliveries easily!
           </p>
           <img
             src="https://img.freepik.com/premium-photo/delivery-drone-online-delivery-concept-sydney-opera-house-ai-generated_599862-1237.jpg"
@@ -108,7 +105,6 @@ const SignUpPage = () => {
         </div>
       </div>
 
-      {/* Right Side Form */}
       <div className="w-full md:w-1/2 lg:w-1/3 p-4 flex justify-center items-center bg-gray-100">
         <div className="p-6 max-w-md bg-white rounded-lg shadow-xl w-full transition-shadow duration-300 hover:shadow-2xl">
           <h2 className="text-xl font-bold mb-4 text-center">Sign Up</h2>
@@ -168,7 +164,7 @@ const SignUpPage = () => {
               <input
                 type="password"
                 name="confirmPassword"
-                placeholder={placeholders[formData.type].password}
+                placeholder="Confirm password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 className="w-full p-2 border transition-all duration-300 hover:border-blue-500"
@@ -195,9 +191,3 @@ const SignUpPage = () => {
 };
 
 export default SignUpPage;
-
-
-
-
-
-

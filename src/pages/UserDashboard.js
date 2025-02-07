@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaCartPlus, FaInfoCircle } from "react-icons/fa"; // Remove FaSignOutAlt
-import Swal from 'sweetalert2'; // Import SweetAlert2
+import Swal from "sweetalert2"; // Import SweetAlert2
 
 const UserDashboard = ({
   setIsLoggedIn,
@@ -15,7 +15,8 @@ const UserDashboard = ({
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedCartItems = JSON.parse(localStorage.getItem(`cartItems_${currentUserEmail}`)) || [];
+    const storedCartItems =
+      JSON.parse(localStorage.getItem(`cartItems_${currentUserEmail}`)) || [];
     setCartItems(storedCartItems);
     setLoading(false); // Set loading to false after data is loaded
   }, [setCartItems, currentUserEmail]);
@@ -40,12 +41,17 @@ const UserDashboard = ({
       ];
     }
     setCartItems(updatedCartItems);
-    localStorage.setItem(`cartItems_${currentUserEmail}`, JSON.stringify(updatedCartItems)); // Store cart items in local storage
-    Swal.fire('Success', `Added ${product.name} to cart!`, 'success');
+    localStorage.setItem(
+      `cartItems_${currentUserEmail}`,
+      JSON.stringify(updatedCartItems)
+    ); // Store cart items in local storage
+    Swal.fire("Success", `Added ${product.name} to cart!`, "success");
   };
 
   const handleViewDetails = (product) => {
-    navigate(`/product/${product.id}`, { state: { product, currentUserEmail } });
+    navigate(`/product/${product.id}`, {
+      state: { product, currentUserEmail },
+    });
   };
 
   const handleCategoryChange = (category) => {
@@ -59,10 +65,12 @@ const UserDashboard = ({
 
   const categoryImages = {
     All: "https://img.freepik.com/premium-photo/drone-flying-modern-cityscape-sunset-ai-generated-image_548729-4502.jpg",
-    Marriage: "https://img.freepik.com/premium-photo/photo-drone-with-camera-remote-control-aerial-photography_933496-28343.jpg",
+    Marriage:
+      "https://img.freepik.com/premium-photo/photo-drone-with-camera-remote-control-aerial-photography_933496-28343.jpg",
     "Food Delivery":
-      "https://files.oaiusercontent.com/file-KP9VxT7U6L8tYKUMtqZzme?se=2025-01-30T22%3A03%3A09Z&sp=r&sv=2024-08-04&sr=b&rscc=max-age%3D604800%2C%20immutable%2C%20private&rscd=attachment%3B%20filename%3D89ca11ab-6624-4b3e-8f70-d62dc06414f2.webp&sig=e/2ppHcUf%2Bcs/ADlyPHgf370VXWBxjQanvnJ%2BwjSPIA%3D",
-    Farming: "https://img.freepik.com/premium-photo/drone-spraying-crops-sunrise_718046-8379.jpg",
+      "https://img.freepik.com/premium-photo/delivery-drone-flying-with-cityscape-background-generative-ai_175949-1134.jpg",
+    Farming:
+      "https://img.freepik.com/premium-photo/drone-spraying-crops-sunrise_718046-8379.jpg",
   };
 
   const categoryTexts = {
@@ -72,7 +80,6 @@ const UserDashboard = ({
     Farming: "Smart drones to help in your farming operations.",
   };
 
-  
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -94,7 +101,7 @@ const UserDashboard = ({
         }}
       >
         <div className="absolute inset-0 bg-black opacity-40"></div>
-        <div className="relative z-10 text-white text-center py-10">
+        <div className="relative z-10 text-white text-center py-10 flex flex-col justify-center items-center">
           <h2 className="text-3xl font-bold">
             {categoryTexts[selectedCategory]}
           </h2>
@@ -145,7 +152,7 @@ const UserDashboard = ({
               <h3 className="text-lg font-semibold">{product.name}</h3>
               <p className="text-sm text-gray-300">{product.category}</p>
               <p className="text-sm text-blue-600 font-bold">
-                ${product.pricePerDay} per day
+                ₹{product.pricePerDay} per day
               </p>
               <div className="flex justify-between mt-3">
                 <button
@@ -153,7 +160,7 @@ const UserDashboard = ({
                     e.stopPropagation();
                     handleAddToCart(product);
                   }}
-                  className="bg-green-600 text-white px-3 py-1 text-sm rounded-lg hover:bg-green-700 transition flex items-center space-x-2"
+                  className="bg-green-600 text-white px-3 py-1 text-sm rounded-lg hover:bg-green-700 transition flex items-center space-x-2 md:text-xs"
                 >
                   <FaCartPlus />
                   <span>Add to Cart</span>
