@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../Authentication/firebaseConfig"; // Ensure path is correct
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -24,6 +24,14 @@ const LoginPage = ({ setIsLoggedIn, setUserType }) => {
       password: "admin1234",
     },
   };
+
+  useEffect(() => {
+    const storedGuestLogin = JSON.parse(localStorage.getItem("guestLogin"));
+    if (storedGuestLogin) {
+      setFormData(storedGuestLogin);
+      setLoginMode(storedGuestLogin.type === "admin" ? "guestAdmin" : "guestUser");
+    }
+  }, []);
 
   // Handle input changes
   const handleChange = (e) => {
@@ -73,16 +81,19 @@ const LoginPage = ({ setIsLoggedIn, setUserType }) => {
       alert("Invalid email or password. Please try again.");
     } finally {
       setLoading(false); // Hide loading state
+      localStorage.removeItem("guestLogin");
     }
   };
 
   const handleGuestLogin = (type) => {
-    setFormData({
+    const guestData = {
       email: placeholders[type].email,
       password: placeholders[type].password,
       type,
-    });
+    };
+    setFormData(guestData);
     setLoginMode(type === "admin" ? "guestAdmin" : "guestUser");
+    localStorage.setItem("guestLogin", JSON.stringify(guestData));
   };
 
   return (

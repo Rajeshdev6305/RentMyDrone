@@ -24,8 +24,13 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
     const prod =
       location.state?.product ||
       products.find((product) => product.id === parseInt(id));
-    setProduct(prod);
-    setLoading(false); // Set loading to false after product is loaded
+    if (prod) {
+      setProduct(prod);
+      setLoading(false); // Set loading to false after product is loaded
+    } else {
+      setLoading(false);
+      Swal.fire('Error', 'Product details are not available.', 'error');
+    }
   }, [id, location.state, products]);
 
   useEffect(() => {
@@ -62,7 +67,6 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
       !endDate ||
       (bookingType === "hour" && (!startHour || !endHour))
     ) {
-      Swal.fire('Error', 'Please fill in all required details.', 'error');
       return;
     }
 
@@ -75,6 +79,7 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
     const isBooked = existingOrders.some((order) => {
       return (
         order.product &&
+        order.product.id === product.id &&
         order.product.id === product.id &&
         ((new Date(startDate) >= new Date(order.startDate) && new Date(startDate) <= new Date(order.endDate)) ||
           (new Date(endDate) >= new Date(order.startDate) && new Date(endDate) <= new Date(order.endDate)))
@@ -188,6 +193,7 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
               product.image.startsWith("data:image")
                 ? product.image
                 : `${process.env.PUBLIC_URL}/${product.image}`
+
             }
             alt={product.name}
             className="w-full h-auto object-cover rounded-lg shadow-lg"
@@ -200,17 +206,17 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
           <div className="flex items-center mb-2">
             {bookingType === "day" && (
               <p className="text-sm text-blue-600 font-bold">
-                ₹{product.pricePerDay} per day
+                ₹{product.pricePerDay} / day
               </p>
             )}
             {bookingType === "month" && (
               <p className="text-sm text-blue-600 font-bold">
-                ₹{product.pricePerMonth} per month
+                ₹{product.pricePerMonth} / month
               </p>
             )}
             {bookingType === "hour" && (
               <p className="text-sm text-blue-600 font-bold">
-                ₹{product.pricePerHour} per hour
+                ₹{product.pricePerHour} / hour
               </p>
             )}
           </div>

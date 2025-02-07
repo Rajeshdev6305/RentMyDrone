@@ -246,10 +246,10 @@ const App = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
+        setIsLoggedIn(true);
         const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
         const currentUser = storedUsers.find((u) => u.email === user.email);
         if (currentUser) {
-          setIsLoggedIn(true);
           setUserType(currentUser.userType);
           setCurrentUserEmail(currentUser.email);
           const storedCartItems = JSON.parse(localStorage.getItem(`cartItems_${currentUser.email}`)) || [];

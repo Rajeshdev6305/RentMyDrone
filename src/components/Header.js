@@ -48,15 +48,21 @@ const Header = ({
   }, [isLoggedIn]);
 
   const handleLogout = () => {
-    auth.signOut().then(() => {
-      setIsLoggedIn(false);
-      navigate("/login");
-      setMenuOpen(false);
-      setProfileMenuOpen(false);
-    }).catch((error) => {
-      console.error("Error signing out: ", error);
-    });
+    setIsLoggedIn(false);
+    localStorage.removeItem("guestLogin"); // Clear guest login data
+    localStorage.removeItem("isLoggedIn"); // Clear logged-in status
+    navigate("/login");
+    setMenuOpen(false);
+    setProfileMenuOpen(false);
   };
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      localStorage.setItem("isLoggedIn", true);
+    } else {
+      localStorage.removeItem("isLoggedIn");
+    }
+  }, [isLoggedIn]);
 
   const handleSearch = (e) => {
     const term = e.target.value;

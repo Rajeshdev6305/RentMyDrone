@@ -175,7 +175,7 @@ const MainBody = ({
                 {product.description}
               </p>
               <p className="text-blue-600 font-bold">
-                ₹{product.pricePerDay} per day
+                ₹{product.pricePerDay} / day
               </p>
               <p className="text-gray-500 text-xs mb-2">
                 Category: {product.category}
