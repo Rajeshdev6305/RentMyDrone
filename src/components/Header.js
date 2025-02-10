@@ -14,6 +14,7 @@ import {
   FaUserCircle,
 } from "react-icons/fa";
 import { auth } from "../Authentication/firebaseConfig";
+import { signOut } from "firebase/auth"; // Import signOut from Firebase auth
 
 const Header = ({
   isLoggedIn,
@@ -22,6 +23,7 @@ const Header = ({
   cartItems = [],
   setSearchTerm,
   products,
+  setUserType, // Add setUserType here
 }) => {
   const navigate = useNavigate();
   const [cartCount, setCartCount] = useState(0);
@@ -47,13 +49,17 @@ const Header = ({
     }
   }, [isLoggedIn]);
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    localStorage.removeItem("guestLogin"); // Clear guest login data
-    localStorage.removeItem("isLoggedIn"); // Clear logged-in status
-    navigate("/login");
-    setMenuOpen(false);
-    setProfileMenuOpen(false);
+  const handleLogout = async () => {
+    try {
+      await signOut(auth); // Sign out the user from Firebase authentication
+      setIsLoggedIn(false);
+      setUserType("");
+      navigate("/login");
+      setMenuOpen(false);
+      setProfileMenuOpen(false);
+    } catch (error) {
+      console.error("Error during logout:", error.message);
+    }
   };
 
   const handleSearch = (e) => {
@@ -360,4 +366,4 @@ const NavLink = ({
   </button>
 );
 
-export default Header;
+export default Header

@@ -5,6 +5,7 @@ import {
   Route,
   Navigate,
   useLocation,
+  useNavigate, // Import useNavigate
 } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -33,12 +34,14 @@ const ScrollToTop = () => {
 };
 
 const App = () => {
+  const navigate = useNavigate(); // Define navigate
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userType, setUserType] = useState(""); // Can be "user" or "admin"
   const [cartItems, setCartItems] = useState([]); // Default to an empty array
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentUserEmail, setCurrentUserEmail] = useState("");
+  const [loading, setLoading] = useState(true); // Add loading state
 
   useEffect(() => {
     // Default products
@@ -48,9 +51,9 @@ const App = () => {
         name: "Marriage Drone X1",
         model: "X1",
         description: "High quality drone for marriage events",
-        pricePerHour: 15,
-        pricePerDay: 100,
-        pricePerMonth: 2500,
+        pricePerHour: 300,
+        pricePerDay: 1000,
+        pricePerMonth: 25000,
         category: "Marriage",
         image: "marriage drone x1.jpg",
         addedBy: "default",
@@ -60,9 +63,9 @@ const App = () => {
         name: "Marriage Drone X2",
         model: "X2",
         description: "Advanced drone for marriage events",
-        pricePerHour: 20,
-        pricePerDay: 120,
-        pricePerMonth: 3000,
+        pricePerHour: 350,
+        pricePerDay: 1200,
+        pricePerMonth: 30000,
         category: "Marriage",
         image:"marriage drone x2.jpg",
         addedBy: "default",
@@ -72,9 +75,9 @@ const App = () => {
         name: "Marriage Drone X3",
         model: "X3",
         description: "Premium drone for marriage events",
-        pricePerHour: 25,
-        pricePerDay: 150,
-        pricePerMonth: 3500,
+        pricePerHour: 400,
+        pricePerDay: 1400,
+        pricePerMonth: 35000,
         category: "Marriage",
         image: "marriage drone x3.jpg",
         addedBy: "default",
@@ -84,9 +87,9 @@ const App = () => {
         name: "Marriage Drone X4",
         model: "X4",
         description: "Luxury drone for marriage events",
-        pricePerHour: 30,
-        pricePerDay: 180,
-        pricePerMonth: 4000,
+        pricePerHour: 450,
+        pricePerDay: 1500,
+        pricePerMonth: 37500,
         category: "Marriage",
         image: "marriage drone x4.jpg",    
         addedBy: "default",
@@ -96,9 +99,9 @@ const App = () => {
         name: "Marriage Drone X5",
         model: "X5",
         description: "Exclusive drone for marriage events",
-        pricePerHour: 35,
-        pricePerDay: 200,
-        pricePerMonth: 4500,
+        pricePerHour: 500,
+        pricePerDay: 1600,
+        pricePerMonth: 40000,
         category: "Marriage",
         image: "marriage drone x5.jpg",      
         addedBy: "default",
@@ -108,9 +111,9 @@ const App = () => {
         name: "Food Delivery Drone X1",
         model: "X1",
         description: "High quality drone for food delivery",
-        pricePerHour: 10,
-        pricePerDay: 60,
-        pricePerMonth: 1500,
+        pricePerHour: 200,
+        pricePerDay: 800,
+        pricePerMonth: 20000,
         category: "Food Delivery",
         image: "food drone x1.jpg",
         addedBy: "default",
@@ -120,9 +123,9 @@ const App = () => {
         name: "Food Delivery Drone X2",
         model: "X2",
         description: "Advanced drone for food delivery",
-        pricePerHour: 12,
-        pricePerDay: 70,
-        pricePerMonth: 1800,
+        pricePerHour: 300,
+        pricePerDay: 900,
+        pricePerMonth: 22000,
         category: "Food Delivery",
         image: "food drone x2.jpg",
         addedBy: "default",
@@ -132,9 +135,9 @@ const App = () => {
         name: "Food Delivery Drone X3",
         model: "X3",
         description: "Premium drone for food delivery",
-        pricePerHour: 15,
-        pricePerDay: 80,
-        pricePerMonth: 2000,
+        pricePerHour: 400,
+        pricePerDay: 1000,
+        pricePerMonth: 25000,
         category: "Food Delivery",
         image: "food drone x3.jpg",
         addedBy: "default",
@@ -144,9 +147,9 @@ const App = () => {
         name: "Food Delivery Drone X4",
         model: "X4",
         description: "Luxury drone for food delivery",
-        pricePerHour: 18,
-        pricePerDay: 90,
-        pricePerMonth: 2200,
+        pricePerHour: 500,
+        pricePerDay: 1200,
+        pricePerMonth: 30000,
         category: "Food Delivery",
         image: "food drone x4.jpg",
         addedBy: "default",
@@ -156,9 +159,9 @@ const App = () => {
         name: "Food Delivery Drone X5",
         model: "X5",
         description: "Exclusive drone for food delivery",
-        pricePerHour: 20,
-        pricePerDay: 100,
-        pricePerMonth: 2500,
+        pricePerHour: 600,
+        pricePerDay: 1500,
+        pricePerMonth: 35000,
         category: "Food Delivery",
         image: "food drone x5.jpg",
         addedBy: "default",
@@ -168,9 +171,9 @@ const App = () => {
         name: "Farming Drone X1",
         model: "X1",
         description: "High quality drone for farming",
-        pricePerHour: 12,
-        pricePerDay: 70,
-        pricePerMonth: 1800,
+        pricePerHour: 500,
+        pricePerDay: 1500,
+        pricePerMonth: 35000,
         category: "Farming",
         image: "farming drone x1.jpg",
         addedBy: "default",
@@ -180,9 +183,9 @@ const App = () => {
         name: "Farming Drone X2",
         model: "X2",
         description: "Advanced drone for farming",
-        pricePerHour: 15,
-        pricePerDay: 80,
-        pricePerMonth: 2000,
+        pricePerHour: 600,
+        pricePerDay: 1700,
+        pricePerMonth: 40000,
         category: "Farming",
         image: "farming drone x2.jpg",
         addedBy: "default",
@@ -192,9 +195,9 @@ const App = () => {
         name: "Farming Drone X3",
         model: "X3",
         description: "Premium drone for farming",
-        pricePerHour: 18,
-        pricePerDay: 90,
-        pricePerMonth: 2200,
+        pricePerHour: 700,
+        pricePerDay: 1900,
+        pricePerMonth: 45000,
         category: "Farming",
         image: "farming drone x3.jpg",
         addedBy: "default",
@@ -204,9 +207,9 @@ const App = () => {
         name: "Farming Drone X4",
         model: "X4",
         description: "Luxury drone for farming",
-        pricePerHour: 20,
-        pricePerDay: 100,
-        pricePerMonth: 2500,
+        pricePerHour: 800,
+        pricePerDay: 2100,
+        pricePerMonth: 50000,
         category: "Farming",
         image: "farming drone x4.jpg",
         addedBy: "default",
@@ -216,9 +219,9 @@ const App = () => {
         name: "Farming Drone X5",
         model: "X5",
         description: "Exclusive drone for farming",
-        pricePerHour: 25,
-        pricePerDay: 120,
-        pricePerMonth: 3000,
+        pricePerHour: 1000,
+        pricePerDay: 2500,
+        pricePerMonth: 60000,
         category: "Farming",
         image: "farming drone x5.jpg",
         addedBy: "default",
@@ -261,6 +264,7 @@ const App = () => {
         setCurrentUserEmail("");
         setCartItems([]);
       }
+      setLoading(false); // Set loading to false after checking auth state
     });
 
     return () => unsubscribe();
@@ -286,134 +290,144 @@ const App = () => {
     }
   }, [cartItems, isLoggedIn, currentUserEmail]);
 
-  return (
-    <Router>
-      <ScrollToTop />
-      <div className="flex flex-col min-h-screen bg-gray-100">
-        {/* Header */}
-        <Header
-          isLoggedIn={isLoggedIn}
-          setIsLoggedIn={setIsLoggedIn}
-          userType={userType}
-          cartItems={cartItems}
-          setSearchTerm={setSearchTerm}
-          products={products}
-        />
-
-        <main className="flex-grow main-content">
-          <Routes>
-            {/* Main Body */}
-            <Route
-              path="/"
-              element={
-                <MainBody
-                  products={products}
-                  searchTerm={searchTerm}
-                  setSearchTerm={setSearchTerm}
-                  setCartItems={setCartItems}
-                />
-              }
-            />
-
-            {/* Authentication Pages */}
-            <Route
-              path="/login"
-              element={
-                isLoggedIn ? (
-                  <Navigate to={userType === "admin" ? "/admin" : "/user-dashboard"} />
-                ) : (
-                  <LoginPage
-                    setIsLoggedIn={setIsLoggedIn}
-                    setUserType={setUserType}
-                  />
-                )
-              }
-            />
-            <Route path="/signup" element={<Signup />} />
-
-            {/* User Dashboard */}
-            <Route
-              path="/user-dashboard"
-              element={
-                isLoggedIn && userType === "user" ? (
-                  <UserDashboard
-                    setIsLoggedIn={setIsLoggedIn}
-                    setCartItems={setCartItems}
-                    cartItems={cartItems}
-                    products={products}
-                    currentUserEmail={currentUserEmail}
-                  />
-                ) : (
-                  <Navigate to="/login" />
-                )
-              }
-            />
-
-            {/* Admin Dashboard */}
-            <Route
-              path="/admin"
-              element={
-                isLoggedIn && userType === "admin" ? (
-                  <AdminDashboard
-                    products={products}
-                    setProducts={setProducts}
-                    currentUserEmail={currentUserEmail}
-                  />
-                ) : (
-                  <Navigate to="/login" />
-                )
-              }
-            />
-
-            {/* Cart Page */}
-            <Route
-              path="/cart"
-              element={
-                isLoggedIn ? (
-                  <CartPage
-                    cartItems={cartItems}
-                    setCartItems={setCartItems}
-                    currentUserEmail={currentUserEmail}
-                  />
-                ) : (
-                  <Navigate to="/login" />
-                )
-              }
-            />
-
-            {/* Payment Page */}
-            <Route
-              path="/payment"
-              element={isLoggedIn ? <PaymentPage currentUserEmail={currentUserEmail} /> : <Navigate to="/login" />}
-            />
-
-            {/* Product Details Page */}
-            <Route
-              path="/product/:id"
-              element={<ProductDetailsPage setCartItems={setCartItems} />}
-            />
-
-            {/* My Orders Page */}
-            <Route
-              path="/my-orders"
-              element={
-                isLoggedIn ? (
-                  <MyOrdersPage currentUserEmail={currentUserEmail} />
-                ) : (
-                  <Navigate to="/login" />
-                )
-              }
-            />
-
-            {/* Redirect Unknown Routes to Home */}
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
-        </main>
-
-        {/* Footer */}
-        <Footer />
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="spinner"></div> {/* Add your spinner component or CSS here */}
       </div>
-    </Router>
+    );
+  }
+
+  return (
+    <div className="flex flex-col min-h-screen bg-gray-100">
+      <ScrollToTop />
+      {/* Header */}
+      <Header
+        isLoggedIn={isLoggedIn}
+        setIsLoggedIn={setIsLoggedIn}
+        userType={userType}
+        cartItems={cartItems}
+        setSearchTerm={setSearchTerm}
+        products={products}
+        setUserType={setUserType} // Pass setUserType here
+      />
+
+      <main className="flex-grow main-content">
+        <Routes>
+          {/* Main Body */}
+          <Route
+            path="/"
+            element={
+              <MainBody
+                products={products}
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                setCartItems={setCartItems}
+              />
+            }
+          />
+
+          {/* Authentication Pages */}
+          <Route
+            path="/login"
+            element={
+              isLoggedIn ? (
+                <Navigate to={userType === "admin" ? "/admin" : "/user-dashboard"} />
+              ) : (
+                <LoginPage
+                  setIsLoggedIn={setIsLoggedIn}
+                  setUserType={setUserType}
+                />
+              )
+            }
+          />
+          <Route
+            path="/signup"
+            element={<Signup onSignupSuccess={() => navigate("/login")} />}
+          />
+
+          {/* User Dashboard */}
+          <Route
+            path="/user-dashboard"
+            element={
+              isLoggedIn && userType === "user" ? (
+                <UserDashboard
+                  setIsLoggedIn={setIsLoggedIn}
+                  setCartItems={setCartItems}
+                  cartItems={cartItems}
+                  products={products}
+                  currentUserEmail={currentUserEmail}
+                />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+
+          {/* Admin Dashboard */}
+          <Route
+            path="/admin"
+            element={
+              isLoggedIn && userType === "admin" ? (
+                <AdminDashboard
+                  products={products}
+                  setProducts={setProducts}
+                  currentUserEmail={currentUserEmail}
+                />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+
+          {/* Cart Page */}
+          <Route
+            path="/cart"
+            element={
+              isLoggedIn ? (
+                <CartPage
+                  cartItems={cartItems}
+                  setCartItems={setCartItems}
+                  currentUserEmail={currentUserEmail}
+                />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+
+          {/* Payment Page */}
+          <Route
+            path="/payment"
+            element={isLoggedIn ? <PaymentPage currentUserEmail={currentUserEmail} /> : <Navigate to="/login" />}
+          />
+
+          {/* Product Details Page */}
+          <Route
+            path="/product/:id"
+            element={<ProductDetailsPage setCartItems={setCartItems} />}
+          />
+
+          {/* My Orders Page */}
+          <Route
+            path="/my-orders"
+            element={
+              isLoggedIn ? (
+                <MyOrdersPage currentUserEmail={currentUserEmail} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+
+          {/* Redirect Unknown Routes to Home */}
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </main>
+
+      {/* Footer */}
+      <Footer />
+    </div>
   );
 };
 

@@ -3,7 +3,6 @@ import {
   FaInfoCircle,
   FaServicestack,
   FaEnvelope,
-  FaStar,
   FaFacebook,
   FaTwitter,
   FaInstagram,
@@ -69,48 +68,6 @@ const Footer = () => {
           </a>
         </div>
 
-        {/* Example Reviews */}
-        <div className="mt-8">
-          <h4 className="font-bold text-lg mb-4 flex items-center space-x-2">
-            <FaStar className="text-yellow-400" />
-            <span>Customer Reviews</span>
-          </h4>
-          <div className="space-y-4">
-            <div className="border border-gray-500 p-4 rounded-lg">
-              <p className="font-bold">John Doe</p>
-              <p className="flex items-center">
-                <FaStar className="text-yellow-500" />
-                <FaStar className="text-yellow-500" />
-                <FaStar className="text-yellow-500" />
-                <FaStar className="text-yellow-500" />
-                <FaStar className="text-gray-400" />
-              </p>
-              <p>"Great service! The drone was delivered on time and worked perfectly for our event."</p>
-            </div>
-            <div className="border border-gray-500 p-4 rounded-lg">
-              <p className="font-bold">Jane Smith</p>
-              <p className="flex items-center">
-                <FaStar className="text-yellow-500" />
-                <FaStar className="text-yellow-500" />
-                <FaStar className="text-yellow-500" />
-                <FaStar className="text-yellow-500" />
-                <FaStar className="text-yellow-500" />
-              </p>
-              <p>"Excellent customer support and high-quality drones. Highly recommend!"</p>
-            </div>
-            <div className="border border-gray-500 p-4 rounded-lg">
-              <p className="font-bold">Alice Johnson</p>
-              <p className="flex items-center">
-                <FaStar className="text-yellow-500" />
-                <FaStar className="text-yellow-500" />
-                <FaStar className="text-yellow-500" />
-                <FaStar className="text-yellow-500" />
-                <FaStar className="text-gray-400" />
-              </p>
-              <p>"The rental process was smooth and hassle-free. The drone performed exceptionally well."</p>
-            </div>
-          </div>
-        </div>
         <div className="text-center mt-8 text-xs md:text-sm text-gray-300">
           &copy; {new Date().getFullYear()} Drone Delivery Service. All rights reserved.
         </div>
