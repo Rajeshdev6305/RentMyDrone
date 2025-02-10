@@ -56,14 +56,6 @@ const Header = ({
     setProfileMenuOpen(false);
   };
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      localStorage.setItem("isLoggedIn", true);
-    } else {
-      localStorage.removeItem("isLoggedIn");
-    }
-  }, [isLoggedIn]);
-
   const handleSearch = (e) => {
     const term = e.target.value;
     setSearchTerm(term);
@@ -368,4 +360,4 @@ const NavLink = ({
   </button>
 );
 
-export default Header
+export default Header;
