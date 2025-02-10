@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa";
 import Swal from 'sweetalert2'; // Import SweetAlert2
+import { useNavigate } from "react-router-dom";
 
 const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
   const [formData, setFormData] = useState({
@@ -30,6 +31,7 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
   const [loading, setLoading] = useState(true); // Add loading state
   const imageInputRef = useRef(null);
   const formRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedProducts = JSON.parse(localStorage.getItem("products")) || [];

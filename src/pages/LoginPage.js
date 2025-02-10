@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth } from "../Authentication/firebaseConfig"; // Ensure path is correct
+import { auth } from "../Authentication/firebaseConfig";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import Swal from "sweetalert2";
 
 const LoginPage = ({ setIsLoggedIn, setUserType }) => {
   const [formData, setFormData] = useState({
@@ -11,6 +12,7 @@ const LoginPage = ({ setIsLoggedIn, setUserType }) => {
   });
   const [loading, setLoading] = useState(false); // Manage loading state
   const [loginMode, setLoginMode] = useState(""); // "login", "guestUser", "guestAdmin"
+  const [error, setError] = useState(""); // Manage error state
   const navigate = useNavigate();
 
   // Default placeholders for each user type
@@ -34,14 +36,17 @@ const LoginPage = ({ setIsLoggedIn, setUserType }) => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true); // Show loading state
+    setError(""); // Clear previous error
 
     try {
       const { email, password, type } = formData;
-
-      // Check if the user is a default user
       if (email === placeholders[type].email && password === placeholders[type].password) {
         setUserType(type);
         setIsLoggedIn(true);
+        localStorage.setItem(
+          "loginState",
+          JSON.stringify({ isLoggedIn: true, userType: type, currentUserEmail: email })
+        );
         navigate(type === "admin" ? "/admin" : "/user-dashboard");
         return;
       }
@@ -64,13 +69,17 @@ const LoginPage = ({ setIsLoggedIn, setUserType }) => {
       if (storedUser && storedUser.password === password && storedUser.userType === type) {
         setUserType(storedUser.userType);
         setIsLoggedIn(true);
+        localStorage.setItem(
+          "loginState",
+          JSON.stringify({ isLoggedIn: true, userType: storedUser.userType, currentUserEmail: email })
+        );
         navigate(storedUser.userType === "admin" ? "/admin" : "/user-dashboard");
       } else {
-        alert("Invalid email, password, or user type. Please try again.");
+        Swal.fire("Error", "Invalid email, password, or user type. Please try again.", "error");
       }
     } catch (error) {
       console.error("Error during login:", error.message);
-      alert("Invalid email or password. Please try again.");
+      Swal.fire("Error", "Invalid email or password. Please try again.", "error");
     } finally {
       setLoading(false); // Hide loading state
     }

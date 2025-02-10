@@ -1,27 +1,26 @@
 import React, { useState, useEffect } from "react";
 import {
-  BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
   useLocation,
-  useNavigate, // Import useNavigate
+  useNavigate,
 } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import MainBody from "./components/MainBody";
 import LoginPage from "./pages/LoginPage";
-import Signup from "./pages/SignUpPage";
+import SignUpPage from "./pages/SignUpPage";
 import CartPage from "./pages/CartPage";
 import PaymentPage from "./pages/PaymentPage";
 import UserDashboard from "./pages/UserDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import MyOrdersPage from "./pages/MyOrdersPage";
-import { auth } from "./Authentication/firebaseConfig"; // Import auth from Firebase config
-import { onAuthStateChanged } from "firebase/auth"; // Import onAuthStateChanged from Firebase auth
-import "./index.css"; // Ensure Tailwind CSS is imported
-import "./App.css"; // Import App.css for custom styles
+import { auth } from "./Authentication/firebaseConfig";
+import { onAuthStateChanged } from "firebase/auth";
+import "./index.css";
+import "./App.css";
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -34,17 +33,17 @@ const ScrollToTop = () => {
 };
 
 const App = () => {
-  const navigate = useNavigate(); // Define navigate
+  const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userType, setUserType] = useState(""); // Can be "user" or "admin"
-  const [cartItems, setCartItems] = useState([]); // Default to an empty array
+  const [userType, setUserType] = useState("");
+  const [cartItems, setCartItems] = useState([]);
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentUserEmail, setCurrentUserEmail] = useState("");
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Default products
+    console.log("Initializing default products");
     const defaultProducts = [
       {
         id: 1,
@@ -67,7 +66,7 @@ const App = () => {
         pricePerDay: 1200,
         pricePerMonth: 30000,
         category: "Marriage",
-        image:"marriage drone x2.jpg",
+        image: "marriage drone x2.jpg",
         addedBy: "default",
       },
       {
@@ -91,9 +90,9 @@ const App = () => {
         pricePerDay: 1500,
         pricePerMonth: 37500,
         category: "Marriage",
-        image: "marriage drone x4.jpg",    
+        image: "marriage drone x4.jpg",
         addedBy: "default",
-        },
+      },
       {
         id: 5,
         name: "Marriage Drone X5",
@@ -103,7 +102,7 @@ const App = () => {
         pricePerDay: 1600,
         pricePerMonth: 40000,
         category: "Marriage",
-        image: "marriage drone x5.jpg",      
+        image: "marriage drone x5.jpg",
         addedBy: "default",
       },
       {
@@ -228,46 +227,70 @@ const App = () => {
       },
     ];
 
-    // Load products from local storage
     const storedProducts = JSON.parse(localStorage.getItem("products")) || [];
+    console.log("Stored products:", storedProducts);
 
-    // Merge default products with stored products, avoiding duplicates
-    const mergedProducts = [...defaultProducts, ...storedProducts.filter(
-      (storedProduct) => !defaultProducts.some(
-        (defaultProduct) => defaultProduct.id === storedProduct.id
-      )
-    )];
+    const mergedProducts = [
+      ...defaultProducts,
+      ...storedProducts.filter(
+        (storedProduct) =>
+          !defaultProducts.some(
+            (defaultProduct) => defaultProduct.id === storedProduct.id
+          )
+      ),
+    ];
 
     setProducts(mergedProducts);
+    console.log("Merged products:", mergedProducts);
   }, []);
 
   useEffect(() => {
-    // Store products in local storage whenever they change
+    console.log("Updating local storage with products:", products);
     localStorage.setItem("products", JSON.stringify(products));
   }, [products]);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setIsLoggedIn(true);
-        const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
-        const currentUser = storedUsers.find((u) => u.email === user.email);
-        if (currentUser) {
-          setUserType(currentUser.userType);
-          setCurrentUserEmail(currentUser.email);
-          const storedCartItems = JSON.parse(localStorage.getItem(`cartItems_${currentUser.email}`)) || [];
-          setCartItems(storedCartItems);
+    console.log("Checking login state");
+    const storedLoginState = JSON.parse(localStorage.getItem("loginState"));
+    if (storedLoginState) {
+      setIsLoggedIn(storedLoginState.isLoggedIn);
+      setUserType(storedLoginState.userType);
+      setCurrentUserEmail(storedLoginState.currentUserEmail);
+      const storedCartItems =
+        JSON.parse(
+          localStorage.getItem(`cartItems_${storedLoginState.currentUserEmail}`)
+        ) || [];
+      setCartItems(storedCartItems);
+      setLoading(false);
+      console.log("Restored login state:", storedLoginState);
+    } else {
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        if (user) {
+          setIsLoggedIn(true);
+          const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
+          const currentUser = storedUsers.find((u) => u.email === user.email);
+          if (currentUser) {
+            setUserType(currentUser.userType);
+            setCurrentUserEmail(currentUser.email);
+            const storedCartItems =
+              JSON.parse(
+                localStorage.getItem(`cartItems_${currentUser.email}`)
+              ) || [];
+            setCartItems(storedCartItems);
+            console.log("User logged in:", currentUser);
+          }
+        } else {
+          setIsLoggedIn(false);
+          setUserType("");
+          setCurrentUserEmail("");
+          setCartItems([]);
+          console.log("User logged out");
         }
-      } else {
-        setIsLoggedIn(false);
-        setUserType("");
-        setCurrentUserEmail("");
-        setCartItems([]);
-      }
-      setLoading(false); // Set loading to false after checking auth state
-    });
+        setLoading(false);
+      });
 
-    return () => unsubscribe();
+      return () => unsubscribe();
+    }
   }, []);
 
   useEffect(() => {
@@ -278,156 +301,160 @@ const App = () => {
       );
       if (currentUser) {
         setCurrentUserEmail(currentUser.email);
-        const storedCartItems = JSON.parse(localStorage.getItem(`cartItems_${currentUser.email}`)) || [];
+        const storedCartItems =
+          JSON.parse(
+            localStorage.getItem(`cartItems_${currentUser.email}`)
+          ) || [];
         setCartItems(storedCartItems);
+        console.log("Restored cart items for user:", currentUser.email);
       }
     }
   }, [isLoggedIn]);
 
   useEffect(() => {
     if (isLoggedIn) {
-      localStorage.setItem(`cartItems_${currentUserEmail}`, JSON.stringify(cartItems));
+      localStorage.setItem(
+        `cartItems_${currentUserEmail}`,
+        JSON.stringify(cartItems)
+      );
+      localStorage.setItem(
+        "loginState",
+        JSON.stringify({ isLoggedIn, userType, currentUserEmail })
+      );
+      console.log("Saved login state and cart items");
+    } else {
+      localStorage.removeItem("loginState");
+      console.log("Removed login state");
     }
-  }, [cartItems, isLoggedIn, currentUserEmail]);
+  }, [cartItems, isLoggedIn, userType, currentUserEmail]);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="spinner"></div> {/* Add your spinner component or CSS here */}
+        <div className="spinner"></div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
+    <>
       <ScrollToTop />
-      {/* Header */}
-      <Header
-        isLoggedIn={isLoggedIn}
-        setIsLoggedIn={setIsLoggedIn}
-        userType={userType}
-        cartItems={cartItems}
-        setSearchTerm={setSearchTerm}
-        products={products}
-        setUserType={setUserType} // Pass setUserType here
-      />
-
-      <main className="flex-grow main-content">
-        <Routes>
-          {/* Main Body */}
-          <Route
-            path="/"
-            element={
-              <MainBody
-                products={products}
-                searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
-                setCartItems={setCartItems}
-              />
-            }
-          />
-
-          {/* Authentication Pages */}
-          <Route
-            path="/login"
-            element={
-              isLoggedIn ? (
-                <Navigate to={userType === "admin" ? "/admin" : "/user-dashboard"} />
-              ) : (
-                <LoginPage
-                  setIsLoggedIn={setIsLoggedIn}
-                  setUserType={setUserType}
-                />
-              )
-            }
-          />
-          <Route
-            path="/signup"
-            element={<Signup onSignupSuccess={() => navigate("/login")} />}
-          />
-
-          {/* User Dashboard */}
-          <Route
-            path="/user-dashboard"
-            element={
-              isLoggedIn && userType === "user" ? (
-                <UserDashboard
-                  setIsLoggedIn={setIsLoggedIn}
-                  setCartItems={setCartItems}
-                  cartItems={cartItems}
+      <div className="flex flex-col min-h-screen bg-gray-100">
+        <Header
+          isLoggedIn={isLoggedIn}
+          setIsLoggedIn={setIsLoggedIn}
+          userType={userType}
+          cartItems={cartItems}
+          setSearchTerm={setSearchTerm}
+          products={products}
+          setUserType={setUserType}
+        />
+        <main className="flex-grow main-content">
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <MainBody
                   products={products}
-                  currentUserEmail={currentUserEmail}
-                />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
-          />
-
-          {/* Admin Dashboard */}
-          <Route
-            path="/admin"
-            element={
-              isLoggedIn && userType === "admin" ? (
-                <AdminDashboard
-                  products={products}
-                  setProducts={setProducts}
-                  currentUserEmail={currentUserEmail}
-                />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
-          />
-
-          {/* Cart Page */}
-          <Route
-            path="/cart"
-            element={
-              isLoggedIn ? (
-                <CartPage
-                  cartItems={cartItems}
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
                   setCartItems={setCartItems}
-                  currentUserEmail={currentUserEmail}
                 />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
-          />
-
-          {/* Payment Page */}
-          <Route
-            path="/payment"
-            element={isLoggedIn ? <PaymentPage currentUserEmail={currentUserEmail} /> : <Navigate to="/login" />}
-          />
-
-          {/* Product Details Page */}
-          <Route
-            path="/product/:id"
-            element={<ProductDetailsPage setCartItems={setCartItems} />}
-          />
-
-          {/* My Orders Page */}
-          <Route
-            path="/my-orders"
-            element={
-              isLoggedIn ? (
-                <MyOrdersPage currentUserEmail={currentUserEmail} />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
-          />
-
-          {/* Redirect Unknown Routes to Home */}
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </main>
-
-      {/* Footer */}
-      <Footer />
-    </div>
+              }
+            />
+            <Route
+              path="/login"
+              element={
+                isLoggedIn ? (
+                  <Navigate
+                    to={userType === "admin" ? "/admin" : "/user-dashboard"}
+                  />
+                ) : (
+                  <LoginPage
+                    setIsLoggedIn={setIsLoggedIn}
+                    setUserType={setUserType}
+                  />
+                )
+              }
+            />
+            <Route
+              path="/signup"
+              element={<SignUpPage onSignupSuccess={() => navigate("/login")} />}
+            />
+            <Route
+              path="/user-dashboard"
+              element={
+                isLoggedIn && userType === "user" ? (
+                  <UserDashboard
+                    setIsLoggedIn={setIsLoggedIn}
+                    setCartItems={setCartItems}
+                    cartItems={cartItems}
+                    products={products}
+                    currentUserEmail={currentUserEmail}
+                  />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                isLoggedIn && userType === "admin" ? (
+                  <AdminDashboard
+                    products={products}
+                    setProducts={setProducts}
+                    currentUserEmail={currentUserEmail}
+                  />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
+            <Route
+              path="/cart"
+              element={
+                isLoggedIn ? (
+                  <CartPage
+                    cartItems={cartItems}
+                    setCartItems={setCartItems}
+                    currentUserEmail={currentUserEmail}
+                  />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
+            <Route
+              path="/payment"
+              element={
+                isLoggedIn ? (
+                  <PaymentPage currentUserEmail={currentUserEmail} />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
+            <Route
+              path="/product/:id"
+              element={<ProductDetailsPage setCartItems={setCartItems} />}
+            />
+            <Route
+              path="/my-orders"
+              element={
+                isLoggedIn ? (
+                  <MyOrdersPage currentUserEmail={currentUserEmail} />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </>
   );
 };
 

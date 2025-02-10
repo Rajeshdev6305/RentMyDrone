@@ -264,6 +264,7 @@ const Header = ({
               isActive={activeSection === "add-product"}
             />
           )}
+         
           {isLoggedIn && (
             <div className="relative hidden md:block">
               <button
