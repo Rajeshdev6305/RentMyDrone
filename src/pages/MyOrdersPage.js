@@ -10,7 +10,8 @@ const MyOrdersPage = ({ currentUserEmail }) => {
 
   useEffect(() => {
     console.log("Fetching orders for:", currentUserEmail);
-    if (auth.currentUser && !auth.currentUser.isAnonymous) { // Check if not guest
+    if (auth.currentUser && !auth.currentUser.isAnonymous) {
+      // Check if not guest
       const storedOrders =
         JSON.parse(localStorage.getItem(`orders_${currentUserEmail}`)) || [];
       console.log("Stored orders:", storedOrders);
@@ -201,14 +202,18 @@ const MyOrdersPage = ({ currentUserEmail }) => {
 
                     <div className="mt-4">
                       {getOrderStatus(order.startDate, order.endDate) !==
-                      "Completed" ? (
-                        <button
-                          onClick={() => handleCancelOrder(order.id)}
-                          className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors duration-300 mt-2"
-                        >
-                          Cancel Order
-                        </button>
-                      ) : (
+                        "Completed" &&
+                        calculateRemainingTime(order.startDate) !==
+                          "Time exceeded" && (
+                          <button
+                            onClick={() => handleCancelOrder(order.id)}
+                            className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors duration-300 mt-2"
+                          >
+                            Cancel Order
+                          </button>
+                        )}
+                      {getOrderStatus(order.startDate, order.endDate) ===
+                        "Completed" && (
                         <button
                           onClick={() => handleRemoveOrder(order.id)}
                           className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors duration-300 mt-2"

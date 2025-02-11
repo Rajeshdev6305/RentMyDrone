@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { FaArrowLeft, FaCartPlus } from "react-icons/fa"; // Remove FaStar
-import Swal from 'sweetalert2'; // Import SweetAlert2
+import { FaArrowLeft, FaCartPlus } from "react-icons/fa";
+import Swal from "sweetalert2";
 
 const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => {
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [loading, setLoading] = useState(true);
   const [deliveryAddress, setDeliveryAddress] = useState("");
-  const [bookingType, setBookingType] = useState("day"); // Default to day
+  const [bookingType, setBookingType] = useState("day");
   const [bookingDuration, setBookingDuration] = useState(1);
   const [quantity, setQuantity] = useState(1);
   const [totalPrice, setTotalPrice] = useState(0);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [startHour, setStartHour] = useState(""); // New state for start hour
-  const [endHour, setEndHour] = useState(""); // New state for end hour
+  const [startHour, setStartHour] = useState("");
+  const [endHour, setEndHour] = useState("");
   const [product, setProduct] = useState(null);
   const currentUserEmail = location.state?.currentUserEmail;
 
@@ -26,16 +26,15 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
       products.find((product) => product.id === parseInt(id));
     if (prod) {
       setProduct(prod);
-      setLoading(false); // Set loading to false after product is loaded
+      setLoading(false);
     } else {
       setLoading(false);
-      Swal.fire('Error', 'Product details are not available.', 'error');
+      Swal.fire("Error", "Product details are not available.", "error");
     }
   }, [id, location.state, products]);
 
   useEffect(() => {
     if (product) {
-      // Calculate total price based on booking type, duration, and quantity
       let price = 0;
       if (bookingType === "day") {
         price = bookingDuration * product.pricePerDay * quantity;
@@ -67,44 +66,58 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
       !endDate ||
       (bookingType === "hour" && (!startHour || !endHour))
     ) {
+      Swal.fire("Error", "Please fill in all required fields.", "error");
       return;
     }
 
     if (!product) {
-      Swal.fire('Error', 'Product details are not available.', 'error');
+      Swal.fire("Error", "Product details are not available.", "error");
       return;
     }
 
-    const existingOrders = JSON.parse(localStorage.getItem("orders")) || [];
-    const isBooked = existingOrders.some((order) => {
+    const email = currentUserEmail || "guest";
+    const existingOrders = JSON.parse(localStorage.getItem("orders")) || {};
+    const userOrders = existingOrders[email] || [];
+    const isBooked = userOrders.some((order) => {
       return (
         order.product &&
         order.product.id === product.id &&
-        order.product.id === product.id &&
-        ((new Date(startDate) >= new Date(order.startDate) && new Date(startDate) <= new Date(order.endDate)) ||
-          (new Date(endDate) >= new Date(order.startDate) && new Date(endDate) <= new Date(order.endDate)))
+        ((new Date(startDate) >= new Date(order.startDate) &&
+          new Date(startDate) <= new Date(order.endDate)) ||
+          (new Date(endDate) >= new Date(order.startDate) &&
+            new Date(endDate) <= new Date(order.endDate)))
       );
     });
 
     if (isBooked) {
-      Swal.fire('Error', 'This product is already booked for the selected dates.', 'error');
+      Swal.fire(
+        "Error",
+        "This product is already booked for the selected dates.",
+        "error"
+      );
       return;
     }
 
+    const newOrder = {
+      product,
+      totalPrice,
+      quantity,
+      bookingType,
+      bookingDuration,
+      deliveryAddress,
+      startDate,
+      endDate,
+      startHour: bookingType === "hour" ? startHour : null,
+      endHour: bookingType === "hour" ? endHour : null,
+      currentUserEmail: email,
+    };
+
+    userOrders.push(newOrder);
+    existingOrders[email] = userOrders;
+    localStorage.setItem("orders", JSON.stringify(existingOrders));
+
     navigate("/payment", {
-      state: {
-        product,
-        totalPrice,
-        quantity,
-        bookingType,
-        bookingDuration,
-        deliveryAddress,
-        startDate,
-        endDate,
-        startHour: bookingType === "hour" ? startHour : null,
-        endHour: bookingType === "hour" ? endHour : null,
-        currentUserEmail, // Pass currentUserEmail to PaymentPage
-      },
+      state: newOrder,
     });
   };
 
@@ -190,10 +203,9 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
         <div>
           <img
             src={
-              product.image.startsWith("data:image")
+              product.image.startsWith("http")
                 ? product.image
                 : `${process.env.PUBLIC_URL}/${product.image}`
-
             }
             alt={product.name}
             className="w-full h-auto object-cover rounded-lg shadow-lg"

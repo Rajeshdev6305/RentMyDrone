@@ -23,7 +23,8 @@ import "./index.css";
 import "./App.css";
 
 const ScrollToTop = () => {
-  const { pathname } = useLocation();
+  const location = useLocation();
+  const pathname = location.pathname;
 
   useEffect(() => {
     window.scrollTo(0, 0);
