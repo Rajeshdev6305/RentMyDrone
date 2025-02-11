@@ -9,9 +9,11 @@ const MyOrdersPage = ({ currentUserEmail }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (auth.currentUser) {
+    console.log("Fetching orders for:", currentUserEmail);
+    if (auth.currentUser && !auth.currentUser.isAnonymous) { // Check if not guest
       const storedOrders =
         JSON.parse(localStorage.getItem(`orders_${currentUserEmail}`)) || [];
+      console.log("Stored orders:", storedOrders);
 
       // Sort orders by startDate in descending order (newest first)
       const sortedOrders = storedOrders.sort((a, b) => {
@@ -21,11 +23,13 @@ const MyOrdersPage = ({ currentUserEmail }) => {
       });
 
       setOrders(sortedOrders);
+      console.log("Sorted orders:", sortedOrders);
     }
     setLoading(false); // Set loading to false after orders are loaded
   }, [currentUserEmail]);
 
   const handleCancelOrder = (orderId) => {
+    console.log("Cancelling order:", orderId);
     // Remove the order and update the state
     const updatedOrders = orders.filter((order) => order.id !== orderId);
     setOrders(updatedOrders); // Update state immediately
@@ -37,6 +41,7 @@ const MyOrdersPage = ({ currentUserEmail }) => {
   };
 
   const handleRemoveOrder = (orderId) => {
+    console.log("Removing order:", orderId);
     // Remove the order and update the state
     const updatedOrders = orders.filter((order) => order.id !== orderId);
     setOrders(updatedOrders); // Update state immediately
@@ -150,11 +155,6 @@ const MyOrdersPage = ({ currentUserEmail }) => {
                       <div className="grid grid-cols-2 gap-2">
                         <p className="font-semibold">Booking Type:</p>
                         <p>{order.bookingType}</p>
-
-                        <p className="font-semibold">Booking Duration:</p>
-                        <p>{order.bookingDuration}</p>
-
-                        <p className="font-semibold">Quantity:</p>
                         <p>{order.quantity}</p>
 
                         <p className="font-semibold">Total Price:</p>

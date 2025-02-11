@@ -359,6 +359,8 @@ const App = () => {
                   searchTerm={searchTerm}
                   setSearchTerm={setSearchTerm}
                   setCartItems={setCartItems}
+                  currentUserEmail={currentUserEmail}
+                  isLoggedIn={isLoggedIn}
                 />
               }
             />
