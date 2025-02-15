@@ -171,6 +171,11 @@ const Header = ({
     setMenuOpen(false);
   };
 
+  const handleManageOrdersClick = () => {
+    navigate("/admin/manage-orders");
+    setMenuOpen(false);
+  };
+
   return (
     <header className="bg-gray-600 text-white p-4 flex justify-between items-center shadow-lg fixed top-0 left-0 w-full z-50">
       <div className="flex items-center">
@@ -264,7 +269,14 @@ const Header = ({
               isActive={activeSection === "add-product"}
             />
           )}
-         
+          {isLoggedIn && userType === "admin" && (
+            <NavLink
+              icon={<FaClipboardList />}
+              label="Manage Orders"
+              onClick={handleManageOrdersClick}
+              isActive={activeSection === "manage-orders"}
+            />
+          )}
           {isLoggedIn && (
             <div className="relative hidden md:block">
               <button

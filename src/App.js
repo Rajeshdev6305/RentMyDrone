@@ -17,6 +17,7 @@ import UserDashboard from "./pages/UserDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import MyOrdersPage from "./pages/MyOrdersPage";
+import ManageOrdersPage from "./pages/ManageOrdersPage";
 import { auth } from "./Authentication/firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
 import "./index.css";
@@ -409,6 +410,16 @@ const App = () => {
                     setProducts={setProducts}
                     currentUserEmail={currentUserEmail}
                   />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
+            <Route
+              path="/admin/manage-orders"
+              element={
+                isLoggedIn && userType === "admin" ? (
+                  <ManageOrdersPage />
                 ) : (
                   <Navigate to="/login" />
                 )

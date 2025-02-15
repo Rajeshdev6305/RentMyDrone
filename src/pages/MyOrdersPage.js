@@ -129,7 +129,9 @@ const MyOrdersPage = ({ currentUserEmail }) => {
           >
             Back
           </button>
-          <h2 className="text-2xl font-bold text-gray-800">My Orders</h2>
+          <h2 className="text-2xl font-bold text-gray-800">
+            My Orders ({orders.length}) {/* Show number of orders */}
+          </h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
           {orders.map(
@@ -156,7 +158,9 @@ const MyOrdersPage = ({ currentUserEmail }) => {
                       <div className="grid grid-cols-2 gap-2">
                         <p className="font-semibold">Booking Type:</p>
                         <p>{order.bookingType}</p>
-                        <p>{order.quantity}</p>
+
+                        <p className="font-semibold">Quantity:</p> {/* Corrected text */}
+                        <p>{order.quantity}</p> {/* Corrected text */}
 
                         <p className="font-semibold">Total Price:</p>
                         <p>₹{order.totalPrice}</p>
@@ -190,8 +194,8 @@ const MyOrdersPage = ({ currentUserEmail }) => {
                           {getOrderStatus(order.startDate, order.endDate)}
                         </p>
 
-                        {getOrderStatus(order.startDate, order.endDate) !==
-                          "Completed" && (
+                        {getOrderStatus(order.startDate, order.endDate) ===
+                          "Pending" && (
                           <>
                             <p className="font-semibold">Cancellation Time:</p>
                             <p>{calculateRemainingTime(order.id)}</p>

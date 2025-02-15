@@ -110,6 +110,10 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
       startHour: bookingType === "hour" ? startHour : null,
       endHour: bookingType === "hour" ? endHour : null,
       currentUserEmail: email,
+      userDetails: {
+        name: "User Name", // Replace with actual user details
+        phone: "User Phone", // Replace with actual user details
+      },
     };
 
     userOrders.push(newOrder);
@@ -201,15 +205,15 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <img
-            src={
-              product.image.startsWith("http")
-                ? product.image
-                : `${process.env.PUBLIC_URL}/${product.image}`
-            }
-            alt={product.name}
-            className="w-full h-auto object-cover rounded-lg shadow-lg"
-          />
+        <img
+  src={
+    product.image.startsWith("http")
+      ? product.image
+      : `${process.env.PUBLIC_URL}/${product.image}`
+  }
+  alt={product.name}
+  className="w-full h-auto object-cover rounded-lg shadow-lg"
+/>
         </div>
 
         <div>

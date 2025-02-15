@@ -109,10 +109,6 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
   };
 
   const handleEditProduct = (product) => {
-    if (product.addedBy !== currentAdmin) {
-      Swal.fire('Error', 'You can only edit products that you added.', 'error');
-      return;
-    }
     setEditingProduct(product);
     setFormData(product);
     setImagePreview(product.image);
@@ -120,11 +116,6 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
   };
 
   const handleDeleteProduct = (productId) => {
-    const productToDelete = products.find((product) => product.id === productId);
-    if (productToDelete.addedBy !== currentAdmin) {
-      Swal.fire('Error', 'You can only delete products that you added.', 'error');
-      return;
-    }
     const updatedProducts = products.filter(
       (product) => product.id !== productId
     );
@@ -307,24 +298,22 @@ const AdminDashboard = ({ products, setProducts, currentAdmin }) => {
                       ₹{product.pricePerDay} per day
                     </p>
                     <p className="text-xs text-gray-500">{product.category}</p>
-                    {product.addedBy === currentAdmin && (
-                      <div className="flex justify-between mt-4">
-                        <button
-                          onClick={() => handleEditProduct(product)}
-                          className="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-600 transition duration-300 flex items-center space-x-2"
-                        >
-                          <FaEdit />
-                          <span>Edit</span>
-                        </button>
-                        <button
-                          onClick={() => handleDeleteProduct(product.id)}
-                          className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition duration-300 flex items-center space-x-2"
-                        >
-                          <FaTrash />
-                          <span>Delete</span>
-                        </button>
-                      </div>
-                    )}
+                    <div className="flex justify-between mt-4">
+                      <button
+                        onClick={() => handleEditProduct(product)}
+                        className="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-600 transition duration-300 flex items-center space-x-2"
+                      >
+                        <FaEdit />
+                        <span>Edit</span>
+                      </button>
+                      <button
+                        onClick={() => handleDeleteProduct(product.id)}
+                        className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition duration-300 flex items-center space-x-2"
+                      >
+                        <FaTrash />
+                        <span>Delete</span>
+                      </button>
+                    </div>
                   </div>
                 ))}
             </div>
