@@ -76,7 +76,7 @@ const ManageOrdersPage = () => {
               <div className="w-full md:w-1/4 mb-4 md:mb-0">
                 <img
                   src={
-                    order.product.image.startsWith("http")
+                    order.product.image.startsWith("data:image")
                       ? order.product.image
                       : `${process.env.PUBLIC_URL}/${order.product.image}`
                   }

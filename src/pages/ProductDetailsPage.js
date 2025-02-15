@@ -207,7 +207,7 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
         <div>
         <img
   src={
-    product.image.startsWith("http")
+    product.image.startsWith("data:image")
       ? product.image
       : `${process.env.PUBLIC_URL}/${product.image}`
   }
