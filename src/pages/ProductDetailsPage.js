@@ -204,7 +204,7 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
+        {/* <div>
         <img
   src={
     product.image.startsWith("data:image")
@@ -213,9 +213,11 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
   }
   alt={product.name}
   className="w-full h-auto object-cover rounded-lg shadow-lg"
+  
 />
-        </div>
+{console.log("Image Path:", `${process.env.PUBLIC_URL}/${product.image}`)}
 
+        </div> */}
         <div>
           <h2 className="text-2xl font-bold mb-4">{product.name}</h2>
 

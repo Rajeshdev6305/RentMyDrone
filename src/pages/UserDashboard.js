@@ -149,6 +149,7 @@ const UserDashboard = ({
                 alt={product.name}
                 className="w-full h-64 object-cover mb-3 rounded-lg"
               />
+              
               <h3 className="text-lg font-semibold">{product.name}</h3>
               <p className="text-sm text-gray-300">{product.category}</p>
               <p className="text-sm text-blue-600 font-bold">
