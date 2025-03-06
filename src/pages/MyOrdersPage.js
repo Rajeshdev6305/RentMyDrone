@@ -1,231 +1,255 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Swal from "sweetalert2"; // Import SweetAlert2
-import { auth } from "../Authentication/firebaseConfig"; // Import auth
+import Swal from "sweetalert2";
+import { auth } from "../Authentication/firebaseConfig";
 
 const MyOrdersPage = ({ currentUserEmail }) => {
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState("All");
   const navigate = useNavigate();
 
+  // Add useEffect to continuously update timers
   useEffect(() => {
-    console.log("Fetching orders for:", currentUserEmail);
-    if (auth.currentUser && !auth.currentUser.isAnonymous) {
-      // Check if not guest
-      const storedOrders =
-        JSON.parse(localStorage.getItem(`orders_${currentUserEmail}`)) || [];
-      console.log("Stored orders:", storedOrders);
+    const loadOrders = () => {
+      if (auth.currentUser && !auth.currentUser.isAnonymous && currentUserEmail) {
+        const storedOrders = JSON.parse(localStorage.getItem(`orders_${currentUserEmail}`)) || [];
+        const sortedOrders = storedOrders.sort(
+          (a, b) => new Date(b.startDate) - new Date(a.startDate)
+        );
+        setOrders(sortedOrders);
+      }
+      setLoading(false);
+    };
 
-      // Sort orders by startDate in descending order (newest first)
-      const sortedOrders = storedOrders.sort((a, b) => {
-        const dateA = new Date(a.startDate); // Convert to Date object
-        const dateB = new Date(b.startDate); // Convert to Date object
-        return dateB - dateA; // Sort descending
-      });
+    loadOrders();
 
-      setOrders(sortedOrders);
-      console.log("Sorted orders:", sortedOrders);
-    }
-    setLoading(false); // Set loading to false after orders are loaded
+    // Add interval to update timers every second
+    const timer = setInterval(() => {
+      setOrders(prevOrders => [...prevOrders]); // Trigger re-render
+    }, 1000);
+
+    return () => clearInterval(timer); // Cleanup interval on unmount
   }, [currentUserEmail]);
 
   const handleCancelOrder = (orderId) => {
-    console.log("Cancelling order:", orderId);
-    // Remove the order and update the state
     const updatedOrders = orders.filter((order) => order.id !== orderId);
-    setOrders(updatedOrders); // Update state immediately
-    localStorage.setItem(
-      `orders_${currentUserEmail}`,
-      JSON.stringify(updatedOrders)
-    );
-    Swal.fire("Success", "Order cancelled successfully.", "success");
+    setOrders(updatedOrders);
+    localStorage.setItem(`orders_${currentUserEmail}`, JSON.stringify(updatedOrders));
+    Swal.fire({
+      icon: "success",
+      title: "Order Cancelled",
+      text: "Your order has been cancelled successfully.",
+      timer: 1500,
+      showConfirmButton: false,
+    });
   };
 
   const handleRemoveOrder = (orderId) => {
-    console.log("Removing order:", orderId);
-    // Remove the order and update the state
     const updatedOrders = orders.filter((order) => order.id !== orderId);
-    setOrders(updatedOrders); // Update state immediately
-    localStorage.setItem(
-      `orders_${currentUserEmail}`,
-      JSON.stringify(updatedOrders)
-    );
-    Swal.fire("Success", "Order removed successfully.", "success");
+    setOrders(updatedOrders);
+    localStorage.setItem(`orders_${currentUserEmail}`, JSON.stringify(updatedOrders));
+    Swal.fire({
+      icon: "success",
+      title: "Order Removed",
+      text: "Order has been removed from your history.",
+      timer: 1500,
+      showConfirmButton: false,
+    });
   };
 
-  const calculateRemainingTime = (orderTime) => {
-    const orderDate = new Date(orderTime);
+  const calculateRemainingCancellationTime = (startDate) => {
+    if (!startDate) return "N/A";
+    const bookingDate = new Date(startDate);
     const now = new Date();
-    const diff = orderDate.getTime() + 60 * 60 * 1000 - now.getTime(); // 1 hour in milliseconds
-    if (diff <= 0) {
-      return "Time exceeded";
-    }
+    const diff = bookingDate.getTime() + 60 * 60 * 1000 - now.getTime();
+    if (diff <= 0) return "Time Exceeded";
     const minutes = Math.floor(diff / (1000 * 60));
     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-    return `${minutes}m ${seconds}s`;
+    return `${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`;
   };
 
   const calculateReturnTime = (endDate) => {
+    if (!endDate) return "N/A";
     const end = new Date(endDate);
     const now = new Date();
     const diff = end - now;
-    if (diff <= 0) {
-      return "Return time exceeded";
-    }
+    if (diff <= 0) return "Overdue";
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
     const minutes = Math.floor((diff / (1000 * 60)) % 60);
-    return `${days}d ${hours}h ${minutes}m`;
+    return `${days.toString().padStart(2, '0')}d ${hours.toString().padStart(2, '0')}h ${minutes.toString().padStart(2, '0')}m`;
   };
 
-  // Determine order status based on dates
   const getOrderStatus = (startDate, endDate) => {
+    if (!startDate || !endDate) return "Pending";
     const now = new Date();
     const start = new Date(startDate);
     const end = new Date(endDate);
-
-    if (now < start) {
-      return "Pending"; // Order is pending before the start date
-    } else if (now >= start && now <= end) {
-      return "Processing"; // Order is processing during the booking window
-    } else {
-      return "Completed"; // Order is completed after the end date
-    }
+    if (now < start) return "Pending";
+    if (now >= start && now <= end) return "Processing";
+    return "Completed";
   };
+
+  const filteredOrders = filter === "All" 
+    ? orders 
+    : orders.filter((order) => getOrderStatus(order.startDate, order.endDate) === filter);
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-600"></div>
+      <div className="flex justify-center items-center min-h-screen bg-gray-100">
+        <div className="relative">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <span className="absolute inset-0 flex items-center justify-center text-sm text-gray-600">
+            Loading...
+          </span>
+        </div>
       </div>
     );
   }
 
-  if (orders.length === 0) {
+  if (!orders.length) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-r from-blue-50 to-purple-50 p-4">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">
-          There are no orders!
-        </h2>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
+        <h2 className="text-3xl font-bold text-gray-800 mb-4">No Orders Yet!</h2>
+        <p className="text-gray-600 mb-6">Start renting drones to see your orders here.</p>
         <button
           onClick={() => navigate("/user-dashboard")}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-300"
+          className="bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 transition-all duration-300 shadow-md"
         >
-          Continue Shopping
+          Explore Drones
         </button>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-blue-50 to-purple-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        {" "}
-        {/* Increased container width */}
-        <div className="flex justify-between items-center mb-6">
+    // ... rest of the JSX remains the same
+    // Make sure the render part matches your original code
+    <div className="min-h-screen bg-gray-100">
+      {/* Sticky Header */}
+      <header className="sticky top-0 z-10 bg-white shadow-md py-4 px-6 flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-gray-800">My Orders</h1>
+        <div className="flex items-center space-x-4">
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="border rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+          >
+            <option value="All">All Orders</option>
+            <option value="Pending">Pending</option>
+            <option value="Processing">Processing</option>
+            <option value="Completed">Completed</option>
+          </select>
           <button
             onClick={() => navigate(-1)}
-            className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors duration-300"
+            className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-all duration-300"
           >
             Back
           </button>
-          <h2 className="text-2xl font-bold text-gray-800">
-            My Orders ({orders.length}) {/* Show number of orders */}
-          </h2>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-          {orders.map(
+      </header>
+
+      {/* Orders Section */}
+      <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredOrders.map(
             (order) =>
               order.product && (
                 <div
                   key={order.id}
-                  className="p-6 bg-white border border-gray-200 rounded-lg shadow-md flex flex-col sm:flex-row"
+                  className="bg-white border rounded-lg shadow-md hover:shadow-lg transition-all duration-300 p-6"
                 >
-                  {/* Product Image Column */}
-                  <div className="sm:w-1/3 mb-4 sm:mb-0">
+                  {/* Image and Status */}
+                  <div className="flex items-center mb-4">
                     <img
                       src={order.product.image}
                       alt={order.product.name}
-                      className="w-full h-48 object-cover rounded-lg"
+                      className="w-20 h-20 object-cover rounded-md mr-4"
                     />
-                  </div>
-                  {/* Order Details Column */}
-                  <div className="sm:w-2/3 pl-4">
-                    <h3 className="text-lg font-semibold text-gray-800">
-                      {order.product.name}
-                    </h3>
-                    <div className="text-sm text-gray-600 mt-2">
-                      <div className="grid grid-cols-2 gap-2">
-                        <p className="font-semibold">Booking Type:</p>
-                        <p>{order.bookingType}</p>
-
-                        <p className="font-semibold">Quantity:</p> {/* Corrected text */}
-                        <p>{order.quantity}</p> {/* Corrected text */}
-
-                        <p className="font-semibold">Total Price:</p>
-                        <p>₹{order.totalPrice}</p>
-
-                        <p className="font-semibold">Start Date:</p>
-                        <p>{order.startDate}</p>
-
-                        <p className="font-semibold">End Date:</p>
-                        <p>{order.endDate}</p>
-
-                        <p className="font-semibold">Remaining Return Time:</p>
-                        <p>{calculateReturnTime(order.endDate)}</p>
-
-                        <p className="font-semibold">Payment Status:</p>
-                        <p>{order.paymentStatus}</p>
-
-                        <p className="font-semibold">Status:</p>
-                        <p
-                          className={`${
-                            getOrderStatus(order.startDate, order.endDate) ===
-                            "Completed"
-                              ? "bg-green-600 text-white"
-                              : getOrderStatus(
-                                  order.startDate,
-                                  order.endDate
-                                ) === "Processing"
-                              ? "bg-blue-600 text-white"
-                              : "bg-yellow-600 text-black"
-                          } px-4 py-2 rounded-full w-max`}
-                        >
-                          {getOrderStatus(order.startDate, order.endDate)}
-                        </p>
-
-                        {getOrderStatus(order.startDate, order.endDate) ===
-                          "Pending" && (
-                          <>
-                            <p className="font-semibold">Cancellation Time:</p>
-                            <p>{calculateRemainingTime(order.id)}</p>
-                          </>
-                        )}
-                      </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-800">
+                        {order.product.name}
+                      </h3>
+                      <span
+                        className={`inline-block px-3 py-1 text-sm font-medium rounded-full ${
+                          getOrderStatus(order.startDate, order.endDate) === "Completed"
+                            ? "bg-green-100 text-green-800"
+                            : getOrderStatus(order.startDate, order.endDate) === "Processing"
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}
+                      >
+                        {getOrderStatus(order.startDate, order.endDate)}
+                      </span>
                     </div>
+                  </div>
 
-                    <div className="mt-4">
-                      {getOrderStatus(order.startDate, order.endDate) !==
-                        "Completed" &&
-                        calculateRemainingTime(order.startDate) !==
-                          "Time exceeded" && (
-                          <button
-                            onClick={() => handleCancelOrder(order.id)}
-                            className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors duration-300 mt-2"
-                          >
-                            Cancel Order
-                          </button>
-                        )}
-                      {getOrderStatus(order.startDate, order.endDate) ===
-                        "Completed" && (
-                        <button
-                          onClick={() => handleRemoveOrder(order.id)}
-                          className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors duration-300 mt-2"
+                  {/* Order Details */}
+                  <div className="text-sm text-gray-600 space-y-2">
+                    <p>
+                      <span className="font-semibold">Booking Type:</span> {order.bookingType}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Quantity:</span> {order.quantity}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Total Price:</span> ₹{order.totalPrice}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Booking Time:</span> {order.startDate}
+                    </p>
+                    <p>
+                      <span className="font-semibold">End Date:</span> {order.endDate}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Return Time:</span>{" "}
+                      <span
+                        className={
+                          calculateReturnTime(order.endDate) === "Overdue" ? "text-red-600" : ""
+                        }
+                      >
+                        {calculateReturnTime(order.endDate)}
+                      </span>
+                    </p>
+                    <p>
+                      <span className="font-semibold">Payment Status:</span> {order.paymentStatus}
+                    </p>
+                    {getOrderStatus(order.startDate, order.endDate) !== "Completed" && (
+                      <p>
+                        <span className="font-semibold">Cancellation Time Left:</span>{" "}
+                        <span
+                          className={
+                            calculateRemainingCancellationTime(order.startDate) === "Time Exceeded"
+                              ? "text-red-600"
+                              : "text-green-600"
+                          }
                         >
-                          Remove Order
+                          {calculateRemainingCancellationTime(order.startDate)}
+                        </span>
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="mt-4 flex space-x-3">
+                    {getOrderStatus(order.startDate, order.endDate) === "Pending" &&
+                      calculateRemainingCancellationTime(order.startDate) !== "Time Exceeded" && (
+                        <button
+                          onClick={() => handleCancelOrder(order.id)}
+                          className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-all duration-300"
+                        >
+                          Cancel Order
                         </button>
                       )}
-                    </div>
+                    {getOrderStatus(order.startDate, order.endDate) === "Completed" && (
+                      <button
+                        onClick={() => handleRemoveOrder(order.id)}
+                        className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-all duration-300"
+                      >
+                        Remove
+                      </button>
+                    )}
                   </div>
                 </div>
               )

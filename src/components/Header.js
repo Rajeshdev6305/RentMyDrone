@@ -14,7 +14,7 @@ import {
   FaUserCircle,
 } from "react-icons/fa";
 import { auth } from "../Authentication/firebaseConfig";
-import { signOut } from "firebase/auth"; // Import signOut from Firebase auth
+import { signOut } from "firebase/auth";
 
 const Header = ({
   isLoggedIn,
@@ -23,7 +23,7 @@ const Header = ({
   cartItems = [],
   setSearchTerm,
   products,
-  setUserType, // Add setUserType here
+  setUserType,
 }) => {
   const navigate = useNavigate();
   const [cartCount, setCartCount] = useState(0);
@@ -40,8 +40,7 @@ const Header = ({
   useEffect(() => {
     if (isLoggedIn && auth.currentUser) {
       const storedOrders =
-        JSON.parse(localStorage.getItem(`orders_${auth.currentUser.email}`)) ||
-        [];
+        JSON.parse(localStorage.getItem(`orders_${auth.currentUser.email}`)) || [];
       const userOrders = storedOrders.filter(
         (order) => order.userEmail === auth.currentUser.email
       );
@@ -51,7 +50,7 @@ const Header = ({
 
   const handleLogout = async () => {
     try {
-      await signOut(auth); // Sign out the user from Firebase authentication
+      await signOut(auth);
       setIsLoggedIn(false);
       setUserType("");
       navigate("/login");
@@ -81,9 +80,7 @@ const Header = ({
       if (productElement) {
         productElement.scrollIntoView({ behavior: "smooth" });
         productElement.classList.add("bg-yellow-100");
-        setTimeout(() => {
-          productElement.classList.remove("bg-yellow-100");
-        }, 2000);
+        setTimeout(() => productElement.classList.remove("bg-yellow-100"), 2000);
       }
     } else {
       navigate(`/product/${product.id}`, { state: { product } });
@@ -102,9 +99,7 @@ const Header = ({
   const handleProductClick = () => {
     if (userType === "admin") {
       const formSection = document.getElementById("add-product-form");
-      if (formSection) {
-        formSection.scrollIntoView({ behavior: "smooth" });
-      }
+      if (formSection) formSection.scrollIntoView({ behavior: "smooth" });
     } else {
       if (window.location.pathname === "/user-dashboard") {
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -154,13 +149,9 @@ const Header = ({
     setMenuOpen(false);
   };
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
+  const toggleMenu = () => setMenuOpen(!menuOpen);
 
-  const toggleProfileMenu = () => {
-    setProfileMenuOpen(!profileMenuOpen);
-  };
+  const toggleProfileMenu = () => setProfileMenuOpen(!profileMenuOpen);
 
   const handleAddProductClick = () => {
     if (window.location.pathname === "/admin") {
@@ -177,18 +168,19 @@ const Header = ({
   };
 
   return (
-    <header className="bg-gray-600 text-white p-4 flex justify-between items-center shadow-lg fixed top-0 left-0 w-full z-50">
-      <div className="flex items-center">
+    <header className="bg-gray-800 text-white py-3 px-4 flex justify-between items-center shadow-lg fixed top-0 left-0 w-full z-50">
+      {/* Logo Section */}
+      <div className="flex items-center space-x-2">
         <img
           src="https://img.freepik.com/premium-photo/delivery-drone-online-delivery-concept-sydney-opera-house-ai-generated_599862-1237.jpg"
           alt="Logo"
-          className="h-12 w-12 mr-2 rounded-full object-cover border-2 border-white"
+          className="h-10 w-10 rounded-full object-cover border-2 border-white"
         />
-        <h1 className="text-xl font-bold text-white hidden lg:block">
-          RentMyDrone
-        </h1>
+        {/* Hide title in tablet view (sm to lg) */}
+        <h1 className="text-lg font-bold block sm:hidden lg:block">RentMyDrone</h1>
       </div>
 
+      {/* Search Bar (Visible when logged in) */}
       {isLoggedIn && (
         <SearchBar
           handleSearch={handleSearch}
@@ -198,14 +190,116 @@ const Header = ({
         />
       )}
 
-      <div className="flex items-center space-x-4">
+      {/* Navigation and Profile */}
+      <div className="flex items-center space-x-2">
         <MobileMenuToggle menuOpen={menuOpen} toggleMenu={toggleMenu} />
 
+        {/* Desktop Navigation */}
         <nav
-          className={`flex-col md:flex-row md:flex items-center space-x-4 ${
-            menuOpen ? "flex" : "hidden"
-          } md:flex md:space-x-2 md:space-y-0 space-y-4 md:justify-between justify-evenly w-full`}
+          className={`hidden md:flex md:items-center md:space-x-3 ${
+            menuOpen ? "hidden" : "flex"
+          }`}
         >
+          {!isLoggedIn && (
+            <NavLink
+              icon={<FaHome />}
+              label="Home"
+              onClick={handleHomeClick}
+              isActive={activeSection === "home"}
+            />
+          )}
+          {isLoggedIn && userType !== "admin" && (
+            <NavLink
+              icon={<FaProductHunt />}
+              label="Products"
+              onClick={handleProductClick}
+              isActive={activeSection === "products"}
+            />
+          )}
+          {!isLoggedIn && (
+            <>
+              <NavLink
+                icon={<FaSignInAlt />}
+                label="Login"
+                onClick={handleLoginClick}
+                isActive={activeSection === "login"}
+              />
+              <NavLink
+                icon={<FaUserPlus />}
+                label="Sign Up"
+                onClick={handleSignUpClick}
+                isActive={activeSection === "signup"}
+              />
+            </>
+          )}
+          <NavLink
+            icon={<FaInfoCircle />}
+            label="About Us"
+            onClick={() => scrollToSection("about-us")}
+          />
+          {isLoggedIn && userType !== "admin" && (
+            <NavLink
+              icon={<FaShoppingCart />}
+              label="Cart"
+              onClick={handleCartClick}
+              isActive={activeSection === "cart"}
+              badge={cartCount > 0 ? cartCount : null}
+            />
+          )}
+          {isLoggedIn && userType !== "admin" && (
+            <NavLink
+              icon={<FaClipboardList />}
+              label="Orders"
+              onClick={handleOrdersClick}
+              isActive={activeSection === "my-orders"}
+              badge={orderCount > 0 ? orderCount : null}
+            />
+          )}
+          {isLoggedIn && userType === "admin" && (
+            <NavLink
+              icon={<FaProductHunt />}
+              label="Add Product"
+              onClick={handleAddProductClick}
+              isActive={activeSection === "add-product"}
+            />
+          )}
+          {isLoggedIn && userType === "admin" && (
+            <NavLink
+              icon={<FaClipboardList />}
+              label="Manage Orders"
+              onClick={handleManageOrdersClick}
+              isActive={activeSection === "manage-orders"}
+            />
+          )}
+        </nav>
+
+        {/* Profile Menu (Desktop) */}
+        {isLoggedIn && (
+          <div className="relative hidden md:block">
+            <button
+              onClick={toggleProfileMenu}
+              className="flex items-center space-x-2 p-2 hover:bg-gray-700 rounded-full transition-colors duration-200"
+            >
+              <FaUserCircle size={28} />
+            </button>
+            {profileMenuOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 px-4 z-50">
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center w-full py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+                >
+                  <FaSignOutAlt className="mr-2" />
+                  <span>Logout</span>
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Mobile Navigation */}
+      {menuOpen && (
+        <nav className="md:hidden absolute top-16 left-0 w-full bg-gray-800 p-4 space-y-4">
           {!isLoggedIn && (
             <NavLink
               icon={<FaHome />}
@@ -278,65 +372,38 @@ const Header = ({
             />
           )}
           {isLoggedIn && (
-            <div className="relative hidden md:block">
-              <button
-                onClick={toggleProfileMenu}
-                className="text-white flex items-center space-x-2 px-4 py-2 text-sm hover:bg-gray-700 rounded-lg transition-colors duration-200"
-              >
-                <FaUserCircle size={24} />
-              </button>
-              {profileMenuOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-3 py-1 text-sm text-gray-700 hover:bg-gray-200"
-                  >
-                    <FaSignOutAlt className="mr-2" />
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-          {isLoggedIn && (
             <NavLink
               icon={<FaSignOutAlt />}
               label="Logout"
               onClick={handleLogout}
-              isActive={activeSection === "logout"}
-              className="bg-red-600 hover:bg-red-700 md:hidden"
+              className="bg-red-600 hover:bg-red-700"
             />
           )}
         </nav>
-      </div>
+      )}
     </header>
   );
 };
 
-const SearchBar = ({
-  handleSearch,
-  suggestions,
-  handleSuggestionClick,
-  menuOpen,
-}) => (
+const SearchBar = ({ handleSearch, suggestions, handleSuggestionClick, menuOpen }) => (
   <div
-    className={`relative flex-1 mx-4 ${
-      menuOpen ? "hidden" : "flex"
-    } ml-1 mr-7`}
+    className={`relative flex-1 mx-2 sm:mx-4 md:mx-6 ${
+      menuOpen ? "hidden sm:flex" : "flex"
+    } max-w-xs sm:max-w-xl md:max-w-2xl`}
   >
     <input
       type="text"
       placeholder="Search for a product..."
       onChange={handleSearch}
-      className="p-2 rounded bg-gray-700 text-white w-full focus:outline-none focus:ring-2 focus:ring-white placeholder-gray-300"
+      className="w-full py-2 px-4 rounded-full bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 transition-all duration-200 text-sm sm:text-base"
     />
     {suggestions.length > 0 && (
-      <ul className="absolute left-0 bg-gray-700 text-white w-full mt-2 rounded shadow-lg max-h-60 overflow-y-auto z-50 space-y-1">
+      <ul className="absolute top-full left-0 w-full bg-gray-700 text-white mt-1 rounded-lg shadow-lg max-h-60 overflow-y-auto z-50">
         {suggestions.map((product) => (
           <li
             key={product.id}
             onClick={() => handleSuggestionClick(product)}
-            className="p-2 hover:bg-gray-600 cursor-pointer transition-colors duration-200"
+            className="p-3 hover:bg-gray-600 cursor-pointer transition-colors duration-200 text-sm"
           >
             {product.name}
           </li>
@@ -349,34 +416,29 @@ const SearchBar = ({
 const MobileMenuToggle = ({ menuOpen, toggleMenu }) => (
   <button
     onClick={toggleMenu}
-    className="md:hidden absolute top-4 right-4 text-white hover:text-gray-300 transition-colors duration-200"
+    className="md:hidden text-white hover:text-gray-300 transition-colors duration-200 p-2"
   >
     {menuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
   </button>
 );
 
-const NavLink = ({
-  icon,
-  label,
-  onClick,
-  isActive,
-  badge = null,
-  className = "",
-}) => (
+const NavLink = ({ icon, label, onClick, isActive, badge = null, className = "" }) => (
   <button
     onClick={onClick}
-    className={`text-white flex items-center space-x-2 px-4 py-2 text-sm hover:bg-gray-700 rounded-lg transition-colors duration-200 ${
-      isActive ? "bg-gray-700" : ""
+    className={`flex items-center justify-between w-full md:w-auto space-x-2 px-4 py-2 md:px-3 md:py-1.5 text-sm rounded-lg transition-colors duration-200 ${
+      isActive ? "bg-gray-700" : "hover:bg-gray-700"
     } ${className}`}
   >
-    {icon}
-    <span>{label}</span>
+    <div className="flex items-center space-x-2">
+      {icon}
+      <span>{label}</span>
+    </div>
     {badge !== null && (
-      <span className="bg-red-600 text-white rounded-full px-2 py-1 text-xs">
+      <span className="bg-red-500 text-white rounded-full px-2 py-0.5 text-xs">
         {badge}
       </span>
     )}
   </button>
 );
 
-export default Header
+export default Header;

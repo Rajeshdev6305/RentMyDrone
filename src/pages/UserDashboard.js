@@ -1,7 +1,10 @@
+
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaCartPlus, FaInfoCircle } from "react-icons/fa"; // Remove FaSignOutAlt
-import Swal from "sweetalert2"; // Import SweetAlert2
+import { FaCartPlus, FaInfoCircle } from "react-icons/fa";
+import { motion, AnimatePresence } from "framer-motion"; // Import Framer Motion
+import Swal from "sweetalert2";
 
 const UserDashboard = ({
   setIsLoggedIn,
@@ -11,14 +14,14 @@ const UserDashboard = ({
   currentUserEmail,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const storedCartItems =
       JSON.parse(localStorage.getItem(`cartItems_${currentUserEmail}`)) || [];
     setCartItems(storedCartItems);
-    setLoading(false); // Set loading to false after data is loaded
+    setLoading(false);
   }, [setCartItems, currentUserEmail]);
 
   const handleAddToCart = (product) => {
@@ -44,8 +47,14 @@ const UserDashboard = ({
     localStorage.setItem(
       `cartItems_${currentUserEmail}`,
       JSON.stringify(updatedCartItems)
-    ); // Store cart items in local storage
-    Swal.fire("Success", `Added ${product.name} to cart!`, "success");
+    );
+    Swal.fire({
+      icon: "success",
+      title: "Added to Cart!",
+      text: `${product.name} has been added to your cart.`,
+      timer: 1500,
+      showConfirmButton: false,
+    });
   };
 
   const handleViewDetails = (product) => {
@@ -74,112 +83,145 @@ const UserDashboard = ({
   };
 
   const categoryTexts = {
-    All: "Explore all our drones for different use cases!",
-    Marriage: "Drone photography for your big day!",
-    "Food Delivery": "Fast, efficient, and reliable food delivery drones.",
-    Farming: "Smart drones to help in your farming operations.",
+    All: "Discover drones for every adventure!",
+    Marriage: "Capture your big day from the sky!",
+    "Food Delivery": "Fast. Fresh. Fly-in Delivery!",
+    Farming: "Precision farming, elevated!",
   };
 
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-600"></div>
+        <motion.div
+          className="rounded-full h-32 w-32 border-t-4 border-b-4 border-blue-600"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+        />
       </div>
     );
   }
 
   return (
-    <div className="relative">
-      {/* Top Category Section with Background Image */}
-      <div
-        className="relative mb-6"
+    <div className="relative bg-gray-50 min-h-screen">
+      {/* Sticky Header */}
+      <header className="sticky top-0 z-20 bg-white shadow-md py-4 px-6 flex justify-between items-center">
+        <motion.h1
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-3xl font-extrabold text-blue-700"
+        >
+          RentMyDrone
+        </motion.h1>
+        
+      </header>
+
+      {/* Hero Section with Animated Background */}
+      <motion.div
+        key={selectedCategory}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="relative mb-8"
         style={{
           backgroundImage: `url(${categoryImages[selectedCategory]})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          height: "500px", // Increased height from 250px to 400px
+          height: "500px",
         }}
       >
-        <div className="absolute inset-0 bg-black opacity-40"></div>
-        <div className="relative z-10 text-white text-center py-10 flex flex-col justify-center items-center">
-          <h2 className="text-3xl font-bold">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-60"></div>
+        <div className="relative z-10 text-white text-center py-16 flex flex-col justify-center items-center h-full">
+          <motion.h2
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.8 }}
+            className="text-4xl md:text-5xl font-bold drop-shadow-lg"
+          >
             {categoryTexts[selectedCategory]}
-          </h2>
+          </motion.h2>
         </div>
+      </motion.div>
+
+      {/* Category Buttons */}
+      <div className="flex justify-center mb-8 space-x-4 px-4">
+        {["All", "Marriage", "Food Delivery", "Farming"].map((category) => (
+          <motion.button
+            key={category}
+            onClick={() => handleCategoryChange(category)}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
+              selectedCategory === category
+                ? "bg-blue-600 text-white shadow-lg"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
+          >
+            {category}
+          </motion.button>
+        ))}
       </div>
 
-      {/* Dashboard Content */}
-      <div className="px-4 py-6">
-        <header className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold">RentMyDrone</h1>
-        </header>
-
-        {/* Category Buttons */}
-        <div className="flex justify-center mb-4 space-x-2">
-          {["All", "Marriage", "Food Delivery", "Farming"].map((category) => (
-            <button
-              key={category}
-              onClick={() => handleCategoryChange(category)}
-              className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
-                selectedCategory === category
-                  ? "bg-blue-600 text-white shadow-lg"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-
-        {/* Available Drones */}
-        <h3 className="text-xl font-semibold mb-4">Available Drones</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredProducts.map((product) => (
-            <div
-              key={product.id}
-              className="border p-4 shadow-md rounded-lg transition-transform transform hover:scale-105 cursor-pointer"
-              onClick={() => handleViewDetails(product)}
-            >
-              <img
-                src={
-                  product.image.startsWith("data:image")
-                    ? product.image
-                    : `${process.env.PUBLIC_URL}/${product.image}`
-                }
-                alt={product.name}
-                className="w-full h-64 object-cover mb-3 rounded-lg"
-              />
-              
-              <h3 className="text-lg font-semibold">{product.name}</h3>
-              <p className="text-sm text-gray-300">{product.category}</p>
-              <p className="text-sm text-blue-600 font-bold">
-                ₹{product.pricePerDay} per day
-              </p>
-              <div className="flex justify-between mt-3">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleAddToCart(product);
-                  }}
-                  className="bg-green-600 text-white px-3 py-1 text-sm rounded-lg hover:bg-green-700 transition flex items-center space-x-2 md:text-xs"
-                >
-                  <FaCartPlus />
-                  <span>Add to Cart</span>
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleViewDetails(product);
-                  }}
-                  className="bg-blue-600 text-white px-3 py-1 text-sm rounded-lg hover:bg-blue-700 transition flex items-center space-x-2"
-                >
-                  <FaInfoCircle />
-                  <span>View Details</span>
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+      {/* Available Drones Section */}
+      <div className="px-6 py-8">
+        <h3 className="text-2xl font-semibold mb-6 text-gray-800">
+          Available Drones
+        </h3>
+        <AnimatePresence>
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {filteredProducts.map((product) => (
+              <motion.div
+                key={product.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="border p-4 bg-white shadow-md rounded-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
+                onClick={() => handleViewDetails(product)}
+              >
+                <img
+                  src={
+                    product.image.startsWith("data:image")
+                      ? product.image
+                      : `${process.env.PUBLIC_URL}/${product.image}`
+                  }
+                  alt={product.name}
+                  className="w-full h-64 object-cover mb-4 rounded-lg"
+                />
+                <h3 className="text-lg font-semibold text-gray-800">
+                  {product.name}
+                </h3>
+                <p className="text-sm text-gray-500">{product.category}</p>
+                <p className="text-sm text-blue-600 font-bold mt-1">
+                  ₹{product.pricePerDay} / day
+                </p>
+                <div className="flex justify-between mt-4">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAddToCart(product);
+                    }}
+                    className="bg-green-600 text-white px-4 py-2 text-sm rounded-lg hover:bg-green-700 transition flex items-center space-x-2"
+                  >
+                    <FaCartPlus />
+                    <span>Add to Cart</span>
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleViewDetails(product);
+                    }}
+                    className="bg-blue-600 text-white px-4 py-2 text-sm rounded-lg hover:bg-blue-700 transition flex items-center space-x-2"
+                  >
+                    <FaInfoCircle />
+                    <span>Details</span>
+                  </motion.button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </AnimatePresence>
       </div>
     </div>
   );
