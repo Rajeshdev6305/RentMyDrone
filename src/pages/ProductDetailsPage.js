@@ -46,7 +46,6 @@
 //       Swal.fire("Error", "Please fill in all required fields.", "error");
 //       return;
 //     }
-//     // Rest of handleBookNow logic remains the same
 //     const email = currentUserEmail || "guest";
 //     const existingOrders = JSON.parse(localStorage.getItem("orders")) || {};
 //     const userOrders = existingOrders[email] || [];
@@ -88,7 +87,6 @@
 //   };
 
 //   const getProductDetails = () => {
-//     // Same getProductDetails logic as before
 //     switch (product.category) {
 //       case "Marriage": return { details: `The ${product.name} is perfect for capturing stunning aerial shots at marriage events.`, controlRange: "40 feet", speed: "20 mph", weight: "500 g", cameraQuality: "4K Ultra HD", batteryLife: "30 minutes", usefulUses: "Ideal for wedding photography, videography, and live streaming.", additionalSpecs: "GPS, Obstacle Avoidance, 3-Axis Gimbal" };
 //       case "Food Delivery": return { details: `The ${product.name} is designed for efficient food delivery.`, controlRange: "50 feet", speed: "15 mph", weight: "600 g", payloadCapacity: "2 kg", batteryLife: "25 minutes", usefulUses: "Perfect for delivering food, groceries, and small packages.", additionalSpecs: "Temperature Control, GPS Tracking, Auto Return" };
@@ -128,50 +126,38 @@
 //         </button>
 
 //         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-//           <div className="md:flex">
-//             {/* Product Image */}
-//             <div className="md:w-1/2 p-6">
-//               <img
-//                 src={product.image.startsWith("data:image") ? product.image : `${process.env.PUBLIC_URL}/${product.image}`}
-//                 alt={product.name}
-//                 className="w-full h-96 object-cover rounded-lg transition-transform duration-300 hover:scale-105"
-//                 onError={(e) => { e.target.src = "/fallback-image.jpg"; }} // Add fallback image
-//               />
+//           {/* Product Details */}
+//           <div className="p-6">
+//             <h1 className="text-3xl font-bold text-gray-800 mb-2">{product.name}</h1>
+//             <div className="flex items-center mb-4">
+//               <FaStar className="text-yellow-400 mr-1" />
+//               <span className="text-gray-600">4.8 (120 reviews)</span>
 //             </div>
 
-//             {/* Product Details */}
-//             <div className="md:w-1/2 p-6">
-//               <h1 className="text-3xl font-bold text-gray-800 mb-2">{product.name}</h1>
-//               <div className="flex items-center mb-4">
-//                 <FaStar className="text-yellow-400 mr-1" />
-//                 <span className="text-gray-600">4.8 (120 reviews)</span>
-//               </div>
+//             <p className="text-gray-600 mb-4">{details}</p>
 
-//               <p className="text-gray-600 mb-4">{details}</p>
-
-//               {/* Pricing */}
-//               <div className="mb-6">
-//                 {bookingType === "day" && <p className="text-2xl font-bold text-blue-600">₹{product.pricePerDay} / day</p>}
-//                 {bookingType === "month" && <p className="text-2xl font-bold text-blue-600">₹{product.pricePerMonth} / month</p>}
-//                 {bookingType === "hour" && <p className="text-2xl font-bold text-blue-600">₹{product.pricePerHour} / hour</p>}
-//               </div>
-
-//               {/* Specs */}
-//               <div className="grid grid-cols-2 gap-4 mb-6">
-//                 <div><span className="font-semibold">Category:</span> {product.category}</div>
-//                 <div><span className="font-semibold">Model:</span> {product.model}</div>
-//                 <div><span className="font-semibold">Range:</span> {controlRange}</div>
-//                 <div><span className="font-semibold">Speed:</span> {speed}</div>
-//                 <div><span className="font-semibold">Weight:</span> {weight}</div>
-//                 <div><span className="font-semibold">Battery:</span> {batteryLife}</div>
-//                 {cameraQuality && <div><span className="font-semibold">Camera:</span> {cameraQuality}</div>}
-//                 {payloadCapacity && <div><span className="font-semibold">Payload:</span> {payloadCapacity}</div>}
-//                 {sprayCapacity && <div><span className="font-semibold">Spray:</span> {sprayCapacity}</div>}
-//               </div>
-
-//               <p className="text-sm text-gray-600"><span className="font-semibold">Useful for:</span> {usefulUses}</p>
-//               <p className="text-sm text-gray-600"><span className="font-semibold">Features:</span> {additionalSpecs}</p>
+//             {/* Pricing */}
+//             <div className="mb-6">
+//               {bookingType === "day" && <p className="text-2xl font-bold text-blue-600">₹{product.pricePerDay} / day</p>}
+//               {bookingType === "month" && <p className="text-2xl font-bold text-blue-600">₹{product.pricePerMonth} / month</p>}
+//               {bookingType === "hour" && <p className="text-2xl font-bold text-blue-600">₹{product.pricePerHour} / hour</p>}
 //             </div>
+
+//             {/* Specs */}
+//             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+//               <div><span className="font-semibold">Category:</span> {product.category}</div>
+//               <div><span className="font-semibold">Model:</span> {product.model}</div>
+//               <div><span className="font-semibold">Range:</span> {controlRange}</div>
+//               <div><span className="font-semibold">Speed:</span> {speed}</div>
+//               <div><span className="font-semibold">Weight:</span> {weight}</div>
+//               <div><span className="font-semibold">Battery:</span> {batteryLife}</div>
+//               {cameraQuality && <div><span className="font-semibold">Camera:</span> {cameraQuality}</div>}
+//               {payloadCapacity && <div><span className="font-semibold">Payload:</span> {payloadCapacity}</div>}
+//               {sprayCapacity && <div><span className="font-semibold">Spray:</span> {sprayCapacity}</div>}
+//             </div>
+
+//             <p className="text-sm text-gray-600"><span className="font-semibold">Useful for:</span> {usefulUses}</p>
+//             <p className="text-sm text-gray-600"><span className="font-semibold">Features:</span> {additionalSpecs}</p>
 //           </div>
 
 //           {/* Booking Form */}
@@ -310,15 +296,40 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
   const [product, setProduct] = useState(null);
   const currentUserEmail = location.state?.currentUserEmail;
 
+  // Fetch product details on mount or when id changes
   useEffect(() => {
-    const prod = location.state?.product || products.find((p) => p.id === parseInt(id));
-    if (prod) {
-      setProduct(prod);
-      setLoading(false);
-    } else {
+    const fetchProduct = () => {
+      // Try to get product from location.state first
+      const prodFromState = location.state?.product;
+      if (prodFromState) {
+        setProduct(prodFromState);
+        setLoading(false);
+        return;
+      }
+
+      // Fallback to products array from props
+      const prodFromProps = products.find((p) => p.id === parseInt(id));
+      if (prodFromProps) {
+        setProduct(prodFromProps);
+        setLoading(false);
+        return;
+      }
+
+      // Fallback to localStorage or an API call (example with localStorage)
+      const storedProducts = JSON.parse(localStorage.getItem("products")) || [];
+      const prodFromStorage = storedProducts.find((p) => p.id === parseInt(id));
+      if (prodFromStorage) {
+        setProduct(prodFromStorage);
+        setLoading(false);
+        return;
+      }
+
+      // If no product is found, show an error
       setLoading(false);
       Swal.fire("Error", "Product details are not available.", "error");
-    }
+    };
+
+    fetchProduct();
   }, [id, location.state, products]);
 
   useEffect(() => {
@@ -406,7 +417,6 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
   return (
     <div className="min-h-screen bg-gray-100 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
           className="mb-6 flex items-center text-gray-600 hover:text-gray-800 transition-colors"
@@ -416,24 +426,18 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
         </button>
 
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          {/* Product Details */}
           <div className="p-6">
             <h1 className="text-3xl font-bold text-gray-800 mb-2">{product.name}</h1>
             <div className="flex items-center mb-4">
               <FaStar className="text-yellow-400 mr-1" />
               <span className="text-gray-600">4.8 (120 reviews)</span>
             </div>
-
             <p className="text-gray-600 mb-4">{details}</p>
-
-            {/* Pricing */}
             <div className="mb-6">
               {bookingType === "day" && <p className="text-2xl font-bold text-blue-600">₹{product.pricePerDay} / day</p>}
               {bookingType === "month" && <p className="text-2xl font-bold text-blue-600">₹{product.pricePerMonth} / month</p>}
               {bookingType === "hour" && <p className="text-2xl font-bold text-blue-600">₹{product.pricePerHour} / hour</p>}
             </div>
-
-            {/* Specs */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
               <div><span className="font-semibold">Category:</span> {product.category}</div>
               <div><span className="font-semibold">Model:</span> {product.model}</div>
@@ -445,12 +449,9 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
               {payloadCapacity && <div><span className="font-semibold">Payload:</span> {payloadCapacity}</div>}
               {sprayCapacity && <div><span className="font-semibold">Spray:</span> {sprayCapacity}</div>}
             </div>
-
             <p className="text-sm text-gray-600"><span className="font-semibold">Useful for:</span> {usefulUses}</p>
             <p className="text-sm text-gray-600"><span className="font-semibold">Features:</span> {additionalSpecs}</p>
           </div>
-
-          {/* Booking Form */}
           <div className="p-6 border-t">
             <h2 className="text-xl font-semibold mb-4">Book This Drone</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -464,7 +465,6 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
                   placeholder="Enter delivery address"
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Booking Type</label>
                 <select
@@ -477,7 +477,6 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
                   <option value="month">Month</option>
                 </select>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Duration</label>
                 <input
@@ -488,7 +487,6 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
                   min="1"
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
                 <input
@@ -499,7 +497,6 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
                   min="1"
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
                 <input
@@ -509,7 +506,6 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
                   className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
                 <input
@@ -519,7 +515,6 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
                   className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
-
               {bookingType === "hour" && (
                 <>
                   <div>
@@ -543,8 +538,6 @@ const ProductDetailsPage = ({ products = [], setCartItems, cartItems = [] }) => 
                 </>
               )}
             </div>
-
-            {/* Total Price and Book Button */}
             <div className="mt-6 flex justify-between items-center">
               <p className="text-2xl font-bold text-gray-800">Total: ₹{totalPrice.toLocaleString()}</p>
               <button
