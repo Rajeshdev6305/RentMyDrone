@@ -1,27 +1,42 @@
-
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaCartPlus, FaInfoCircle } from "react-icons/fa";
-import { motion, AnimatePresence } from "framer-motion"; // Import Framer Motion
+import { motion, AnimatePresence } from "framer-motion";
 import Swal from "sweetalert2";
 
 const UserDashboard = ({
   setIsLoggedIn,
   setCartItems,
   cartItems,
-  products,
   currentUserEmail,
 }) => {
+  const [products, setProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Load products from localStorage
+    const storedProducts = JSON.parse(localStorage.getItem("products")) || [];
+    setProducts(storedProducts);
+
+    // Load cart items
     const storedCartItems =
       JSON.parse(localStorage.getItem(`cartItems_${currentUserEmail}`)) || [];
     setCartItems(storedCartItems);
+
     setLoading(false);
+
+    // Listen for storage changes from other tabs
+    const handleStorageChange = (e) => {
+      if (e.key === "products") {
+        const updatedProducts = JSON.parse(e.newValue) || [];
+        setProducts(updatedProducts);
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, [setCartItems, currentUserEmail]);
 
   const handleAddToCart = (product) => {
@@ -103,7 +118,6 @@ const UserDashboard = ({
 
   return (
     <div className="relative bg-gray-50 min-h-screen">
-      {/* Sticky Header */}
       <header className="sticky top-0 z-20 bg-white shadow-md py-4 px-6 flex justify-between items-center">
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
@@ -112,10 +126,8 @@ const UserDashboard = ({
         >
           RentMyDrone
         </motion.h1>
-        
       </header>
 
-      {/* Hero Section with Animated Background */}
       <motion.div
         key={selectedCategory}
         initial={{ opacity: 0 }}
@@ -142,7 +154,6 @@ const UserDashboard = ({
         </div>
       </motion.div>
 
-      {/* Category Buttons */}
       <div className="flex justify-center mb-8 space-x-4 px-4">
         {["All", "Marriage", "Food Delivery", "Farming"].map((category) => (
           <motion.button
@@ -161,67 +172,71 @@ const UserDashboard = ({
         ))}
       </div>
 
-      {/* Available Drones Section */}
       <div className="px-6 py-8">
         <h3 className="text-2xl font-semibold mb-6 text-gray-800">
           Available Drones
         </h3>
-        <AnimatePresence>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredProducts.map((product) => (
-              <motion.div
-                key={product.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-                className="border p-4 bg-white shadow-md rounded-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
-                onClick={() => handleViewDetails(product)}
-              >
-                <img
-                  src={
-                    product.image.startsWith("data:image")
-                      ? product.image
-                      : `${process.env.PUBLIC_URL}/${product.image}`
-                  }
-                  alt={product.name}
-                  className="w-full h-64 object-cover mb-4 rounded-lg"
-                />
-                <h3 className="text-lg font-semibold text-gray-800">
-                  {product.name}
-                </h3>
-                <p className="text-sm text-gray-500">{product.category}</p>
-                <p className="text-sm text-blue-600 font-bold mt-1">
-                  ₹{product.pricePerDay} / day
-                </p>
-                <div className="flex justify-between mt-4">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleAddToCart(product);
-                    }}
-                    className="bg-green-600 text-white px-4 py-2 text-sm rounded-lg hover:bg-green-700 transition flex items-center space-x-2"
-                  >
-                    <FaCartPlus />
-                    <span>Add to Cart</span>
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleViewDetails(product);
-                    }}
-                    className="bg-blue-600 text-white px-4 py-2 text-sm rounded-lg hover:bg-blue-700 transition flex items-center space-x-2"
-                  >
-                    <FaInfoCircle />
-                    <span>Details</span>
-                  </motion.button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </AnimatePresence>
+        {filteredProducts.length === 0 ? (
+          <p className="text-center text-gray-500">No products available.</p>
+        ) : (
+          <AnimatePresence>
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {filteredProducts.map((product) => (
+                <motion.div
+                  key={product.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                  className="border p-4 bg-white shadow-md rounded-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
+                  onClick={() => handleViewDetails(product)}
+                >
+                  <img
+                    src={
+                      product.image && product.image.startsWith("data:image")
+                        ? product.image
+                        : `${process.env.PUBLIC_URL}/${product.image || "fallback-image.jpg"}`
+                    }
+                    alt={product.name}
+                    className="w-full h-64 object-cover mb-4 rounded-lg"
+                    onError={(e) => (e.target.src = "/fallback-image.jpg")}
+                  />
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    {product.name || "Unnamed Product"}
+                  </h3>
+                  <p className="text-sm text-gray-500">{product.category || "Uncategorized"}</p>
+                  <p className="text-sm text-blue-600 font-bold mt-1">
+                    ₹{product.pricePerDay ? product.pricePerDay.toLocaleString() : "N/A"} / day
+                  </p>
+                  <div className="flex justify-between mt-4">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleAddToCart(product);
+                      }}
+                      className="bg-green-600 text-white px-4 py-2 text-sm rounded-lg hover:bg-green-700 transition flex items-center space-x-2"
+                    >
+                      <FaCartPlus />
+                      <span>Add to Cart</span>
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleViewDetails(product);
+                      }}
+                      className="bg-blue-600 text-white px-4 py-2 text-sm rounded-lg hover:bg-blue-700 transition flex items-center space-x-2"
+                    >
+                      <FaInfoCircle />
+                      <span>Details</span>
+                    </motion.button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </AnimatePresence>
+        )}
       </div>
     </div>
   );
