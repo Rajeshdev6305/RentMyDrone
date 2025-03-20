@@ -1,18 +1,24 @@
-
 import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 
 const ManageOrdersPage = () => {
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [loading, setLoading] = useState(true);
 
   const fetchOrders = () => {
-    const allOrders = JSON.parse(localStorage.getItem("orders")) || {};
-    const ordersArray = Object.keys(allOrders).flatMap((email) =>
-      allOrders[email].map((order) => ({ ...order, userEmail: email }))
-    );
-    setOrders(ordersArray);
-    setLoading(false); // Set loading to false after fetching
+    try {
+      const allOrders = JSON.parse(localStorage.getItem("orders")) || {};
+      const ordersArray = Object.keys(allOrders).flatMap((email) =>
+        allOrders[email].map((order) => ({ ...order, userEmail: email }))
+      );
+      setOrders(ordersArray);
+    } catch (error) {
+      console.error("Error fetching orders from localStorage:", error);
+      setOrders([]); // Fallback to empty array if parsing fails
+      Swal.fire("Error", "Failed to load orders!", "error");
+    } finally {
+      setLoading(false); // Ensure loading is set to false regardless of success or failure
+    }
   };
 
   useEffect(() => {
@@ -48,17 +54,21 @@ const ManageOrdersPage = () => {
         const existingOrders = JSON.parse(localStorage.getItem("orders")) || {};
         const userOrders = existingOrders[deletedOrder.userEmail] || [];
         const updatedUserOrders = userOrders.filter((order) => order.id !== deletedOrder.id);
-        
+
         // Update localStorage
-        if (updatedUserOrders.length > 0) {
-          existingOrders[deletedOrder.userEmail] = updatedUserOrders;
-        } else {
-          delete existingOrders[deletedOrder.userEmail]; // Remove user key if no orders remain
+        try {
+          if (updatedUserOrders.length > 0) {
+            existingOrders[deletedOrder.userEmail] = updatedUserOrders;
+          } else {
+            delete existingOrders[deletedOrder.userEmail]; // Remove user key if no orders remain
+          }
+          localStorage.setItem("orders", JSON.stringify(existingOrders));
+          setOrders(updatedOrders);
+          Swal.fire("Deleted!", "The order has been removed.", "success");
+        } catch (error) {
+          console.error("Error updating localStorage:", error);
+          Swal.fire("Error", "Failed to delete order!", "error");
         }
-        
-        localStorage.setItem("orders", JSON.stringify(existingOrders));
-        setOrders(updatedOrders);
-        Swal.fire("Deleted!", "The order has been removed.", "success");
       }
     });
   };
@@ -68,6 +78,7 @@ const ManageOrdersPage = () => {
     const start = new Date(startDate);
     const end = new Date(endDate);
 
+    if (!startDate || !endDate) return "Unknown"; // Handle missing dates
     if (now < start) return "Pending";
     else if (now >= start && now <= end) return "Processing";
     else return "Completed";
@@ -81,6 +92,8 @@ const ManageOrdersPage = () => {
         return "bg-blue-100 text-blue-800";
       case "Completed":
         return "bg-green-100 text-green-800";
+      case "Unknown":
+        return "bg-gray-100 text-gray-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -128,12 +141,12 @@ const ManageOrdersPage = () => {
                     {order.product?.name || "Unnamed Product"}
                   </h2>
                   <p className="text-sm text-gray-600">
-                    <span className="font-medium">User:</span> {order.userEmail}
+                    <span className="font-medium">User:</span> {order.userEmail || "N/A"}
                   </p>
                   {order.product?.models && (
                     <p className="text-sm text-gray-600">
                       <span className="font-medium">Models:</span>{" "}
-                      {order.product.models.join(", ")}
+                      {order.product.models.join(", ") || "N/A"}
                     </p>
                   )}
                   <p className="text-sm text-gray-600">
