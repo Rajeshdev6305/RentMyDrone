@@ -20,6 +20,9 @@ const PaymentPage = ({ currentUserEmail }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const guestEmail = "guest@guest.com"; // Default email for guest users
+  const emailToUse = currentUserEmail || guestEmail; // Use currentUserEmail if logged in, otherwise guestEmail
+
   const { product, totalPrice, quantity, bookingType, bookingDuration, deliveryAddress, startDate, endDate } = location.state || {};
   const [calculatedTotalPrice, setCalculatedTotalPrice] = useState(totalPrice);
 
@@ -68,11 +71,11 @@ const PaymentPage = ({ currentUserEmail }) => {
         startDate,
         endDate,
         paymentStatus: "Paid",
-        userEmail: currentUserEmail,
+        userEmail: emailToUse, // Use the determined email
       };
 
-      const existingOrders = JSON.parse(localStorage.getItem(`orders_${currentUserEmail}`)) || [];
-      localStorage.setItem(`orders_${currentUserEmail}`, JSON.stringify([...existingOrders, newOrder]));
+      const existingOrders = JSON.parse(localStorage.getItem(`orders_${emailToUse}`)) || [];
+      localStorage.setItem(`orders_${emailToUse}`, JSON.stringify([...existingOrders, newOrder]));
 
       setPaymentDetails({
         cardNumber: "",

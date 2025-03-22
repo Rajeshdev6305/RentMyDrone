@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 const ManageOrdersPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const fetchOrders = () => {
     try {
@@ -11,7 +13,11 @@ const ManageOrdersPage = () => {
       const ordersArray = Object.keys(allOrders).flatMap((email) =>
         allOrders[email].map((order) => ({ ...order, userEmail: email }))
       );
-      setOrders(ordersArray);
+
+      const guestOrders = JSON.parse(localStorage.getItem("orders_guest@guest.com")) || [];
+      const combinedOrders = [...ordersArray, ...guestOrders.map((order) => ({ ...order, userEmail: "guest@guest.com" }))];
+
+      setOrders(combinedOrders);
     } catch (error) {
       console.error("Error fetching orders from localStorage:", error);
       setOrders([]); // Fallback to empty array if parsing fails
@@ -20,6 +26,14 @@ const ManageOrdersPage = () => {
       setLoading(false); // Ensure loading is set to false regardless of success or failure
     }
   };
+
+  useEffect(() => {
+    const loginState = JSON.parse(localStorage.getItem("loginState"));
+    if (!loginState?.isLoggedIn || loginState.userType !== "admin") {
+      localStorage.setItem("redirectPath", window.location.pathname); // Store current path
+      navigate("/login");
+    }
+  }, [navigate]);
 
   useEffect(() => {
     fetchOrders(); // Fetch orders on mount
@@ -97,6 +111,45 @@ const ManageOrdersPage = () => {
       default:
         return "bg-gray-100 text-gray-800";
     }
+  };
+
+  const calculateRemainingCancellationTime = (bookingTime) => {
+    if (!bookingTime) return "N/A";
+
+    const bookingDate = new Date(bookingTime);
+    const now = new Date();
+
+    // Calculate the cancellation deadline (2 hours from booking time)
+    const cancellationDeadline = new Date(bookingDate.getTime() + 2 * 60 * 60 * 1000);
+
+    // Calculate remaining time
+    const diff = cancellationDeadline.getTime() - now.getTime();
+
+    if (diff <= 0) return "Time Exceeded";
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+
+    return `${days > 0 ? `${days}d ` : ""}${hours > 0 ? `${hours}h ` : ""}${minutes}m ${seconds}s`;
+  };
+
+  const calculateReturnTime = (endDate, status) => {
+    if (status === "Completed") return "Successfully Returned";
+    if (!endDate) return "N/A";
+
+    const end = new Date(endDate);
+    const now = new Date();
+    const diff = end - now;
+
+    if (diff <= 0) return "Overdue";
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+
+    return `${days > 0 ? `${days}d ` : ""}${hours > 0 ? `${hours}h ` : ""}${minutes}m`;
   };
 
   if (loading) {
@@ -179,6 +232,32 @@ const ManageOrdersPage = () => {
                         <span className="font-medium">End Hour:</span> {order.endHour || "N/A"}
                       </p>
                     </>
+                  )}
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium">Return Time:</span>{" "}
+                    <span
+                      className={
+                        calculateReturnTime(order.endDate, getOrderStatus(order.startDate, order.endDate)) === "Overdue"
+                          ? "text-red-600"
+                          : ""
+                      }
+                    >
+                      {calculateReturnTime(order.endDate, getOrderStatus(order.startDate, order.endDate))}
+                    </span>
+                  </p>
+                  {getOrderStatus(order.startDate, order.endDate) !== "Completed" && (
+                    <p className="text-sm text-gray-600">
+                      <span className="font-medium">Cancellation Time Left:</span>{" "}
+                      <span
+                        className={
+                          calculateRemainingCancellationTime(order.startDate) === "Time Exceeded"
+                            ? "text-red-600"
+                            : "text-green-600"
+                        }
+                      >
+                        {calculateRemainingCancellationTime(order.startDate)}
+                      </span>
+                    </p>
                   )}
                   <div className="flex items-center justify-between mt-4">
                     <span

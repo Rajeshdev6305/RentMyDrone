@@ -31,6 +31,14 @@ const CartPage = ({ cartItems, setCartItems, currentUserEmail }) => {
     storeCartItems(cartItems);
   }, [cartItems, currentUserEmail]);
 
+  useEffect(() => {
+    const loginState = JSON.parse(localStorage.getItem("loginState"));
+    if (!loginState?.isLoggedIn || loginState.userType !== "user") {
+      localStorage.setItem("redirectPath", window.location.pathname); // Store current path
+      navigate("/login");
+    }
+  }, [navigate]);
+
   const handleRemoveItem = (itemId) => {
     setCartItems(cartItems.filter((item) => item.id !== itemId));
     Swal.fire("Success", "Item removed from cart.", "success");

@@ -10,38 +10,34 @@ const MyOrdersPage = () => {
   const [filter, setFilter] = useState("All");
   const navigate = useNavigate();
 
-  // Fetch orders and update timers
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user && !user.isAnonymous) {
-        const email = user.email;
-        const storedOrders = JSON.parse(localStorage.getItem(`orders_${email}`)) || [];
-        const sortedOrders = storedOrders.sort(
-          (a, b) => new Date(b.startDate) - new Date(a.startDate)
-        );
-        setOrders(sortedOrders);
-      } else {
-        setOrders([]); // Clear orders if user is not logged in or is anonymous
-      }
-      setLoading(false);
-    });
+  const guestEmail = "guest@guest.com"; // Default email for guest users
+  const currentUserEmail = auth.currentUser?.email || guestEmail; // Use logged-in email or guest email
 
-    // Update timers every second
+  useEffect(() => {
+    const loginState = JSON.parse(localStorage.getItem("loginState"));
+    if (!loginState?.isLoggedIn || loginState.userType !== "user") {
+      localStorage.setItem("redirectPath", window.location.pathname); // Store current path
+      navigate("/login");
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    const storedOrders = JSON.parse(localStorage.getItem(`orders_${currentUserEmail}`)) || [];
+    const sortedOrders = storedOrders.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+    setOrders(sortedOrders);
+    setLoading(false);
+
     const timer = setInterval(() => {
-      setOrders((prevOrders) => [...prevOrders]); // Trigger re-render for timers
+      setOrders((prevOrders) => [...prevOrders]);
     }, 1000);
 
-    // Cleanup on unmount
-    return () => {
-      unsubscribe();
-      clearInterval(timer);
-    };
-  }, []); // Empty dependency array since we handle auth state changes internally
+    return () => clearInterval(timer);
+  }, [currentUserEmail]);
 
   const handleCancelOrder = (orderId) => {
     const updatedOrders = orders.filter((order) => order.id !== orderId);
     setOrders(updatedOrders);
-    localStorage.setItem(`orders_${auth.currentUser.email}`, JSON.stringify(updatedOrders));
+    localStorage.setItem(`orders_${currentUserEmail}`, JSON.stringify(updatedOrders));
     Swal.fire({
       icon: "success",
       title: "Order Cancelled",
@@ -54,7 +50,7 @@ const MyOrdersPage = () => {
   const handleRemoveOrder = (orderId) => {
     const updatedOrders = orders.filter((order) => order.id !== orderId);
     setOrders(updatedOrders);
-    localStorage.setItem(`orders_${auth.currentUser.email}`, JSON.stringify(updatedOrders));
+    localStorage.setItem(`orders_${currentUserEmail}`, JSON.stringify(updatedOrders));
     Swal.fire({
       icon: "success",
       title: "Order Removed",
@@ -64,26 +60,42 @@ const MyOrdersPage = () => {
     });
   };
 
-  const calculateRemainingCancellationTime = (startDate) => {
-    if (!startDate) return "N/A";
-    const bookingDate = new Date(startDate);
-    const now = new Date();
-    const diff = bookingDate.getTime() + 60 * 60 * 1000 - now.getTime(); // 1-hour cancellation window
-    if (diff <= 0) return "Time Exceeded";
-    const minutes = Math.floor(diff / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-    return `${minutes.toString().padStart(2, "0")}m ${seconds.toString().padStart(2, "0")}s`;
-  };
+  const calculateRemainingCancellationTime = (bookingTime) => {
+    if (!bookingTime) return "N/A";
 
-  const calculateReturnTime = (endDate) => {
-    if (!endDate) return "N/A";
-    const end = new Date(endDate);
+    const bookingDate = new Date(bookingTime);
     const now = new Date();
-    const diff = end - now;
-    if (diff <= 0) return "Overdue";
+
+    // Calculate the cancellation deadline (2 hours from booking time)
+    const cancellationDeadline = new Date(bookingDate.getTime() + 2 * 60 * 60 * 1000);
+
+    // Calculate remaining time
+    const diff = cancellationDeadline.getTime() - now.getTime();
+
+    if (diff <= 0) return "Time Exceeded";
+
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
     const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+
+    return `${days > 0 ? `${days}d ` : ""}${hours > 0 ? `${hours}h ` : ""}${minutes}m ${seconds}s`;
+  };
+
+  const calculateReturnTime = (endDate, status) => {
+    if (status === "Completed") return "Successfully Returned";
+    if (!endDate) return "N/A";
+
+    const end = new Date(endDate);
+    const now = new Date();
+    const diff = end - now;
+
+    if (diff <= 0) return "Overdue";
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+
     return `${days.toString().padStart(2, "0")}d ${hours.toString().padStart(2, "0")}h ${minutes.toString().padStart(2, "0")}m`;
   };
 
@@ -114,21 +126,6 @@ const MyOrdersPage = () => {
     );
   }
 
-  if (!auth.currentUser) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
-        <h2 className="text-3xl font-bold text-gray-800 mb-4">Please Log In</h2>
-        <p className="text-gray-600 mb-6">You need to log in to view your orders.</p>
-        <button
-          onClick={() => navigate("/login")}
-          className="bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 transition-all duration-300 shadow-md"
-        >
-          Log In
-        </button>
-      </div>
-    );
-  }
-
   if (!orders.length) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
@@ -146,7 +143,6 @@ const MyOrdersPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Sticky Header */}
       <header className="sticky top-0 z-10 bg-white shadow-md py-4 px-6 flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-800">My Orders</h1>
         <div className="flex items-center space-x-4">
@@ -169,7 +165,6 @@ const MyOrdersPage = () => {
         </div>
       </header>
 
-      {/* Orders Section */}
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredOrders.map(
@@ -229,10 +224,10 @@ const MyOrdersPage = () => {
                       <span className="font-semibold">Return Time:</span>{" "}
                       <span
                         className={
-                          calculateReturnTime(order.endDate) === "Overdue" ? "text-red-600" : ""
+                          calculateReturnTime(order.endDate, getOrderStatus(order.startDate, order.endDate)) === "Overdue" ? "text-red-600" : ""
                         }
                       >
-                        {calculateReturnTime(order.endDate)}
+                        {calculateReturnTime(order.endDate, getOrderStatus(order.startDate, order.endDate))}
                       </span>
                     </p>
                     <p>
@@ -256,15 +251,14 @@ const MyOrdersPage = () => {
                   </div>
 
                   <div className="mt-4 flex space-x-3">
-                    {getOrderStatus(order.startDate, order.endDate) === "Pending" &&
-                      calculateRemainingCancellationTime(order.startDate) !== "Time Exceeded" && (
-                        <button
-                          onClick={() => handleCancelOrder(order.id)}
-                          className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-all duration-300"
-                        >
-                          Cancel Order
-                        </button>
-                      )}
+                    {calculateRemainingCancellationTime(order.startDate) !== "Time Exceeded" && (
+                      <button
+                        onClick={() => handleCancelOrder(order.id)}
+                        className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-all duration-300"
+                      >
+                        Cancel Order
+                      </button>
+                    )}
                     {getOrderStatus(order.startDate, order.endDate) === "Completed" && (
                       <button
                         onClick={() => handleRemoveOrder(order.id)}

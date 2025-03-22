@@ -14,7 +14,7 @@ const Footer = () => {
     <footer className="bg-gray-800 text-gray-200 py-12">
       <div className="container mx-auto px-4 md:px-6">
         {/* Main Footer Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           {/* About the Company */}
           <div id="about-us" className="space-y-4">
             <h4 className="font-semibold text-xl flex items-center space-x-2">
@@ -68,16 +68,16 @@ const Footer = () => {
           <div id="newsletter" className="space-y-4">
             <h4 className="font-semibold text-xl">Stay Updated</h4>
             <p className="text-sm">Subscribe to our newsletter for the latest updates and offers.</p>
-            <form className="flex flex-col sm:flex-row gap-2">
+            <form className="flex flex-col gap-2">
               <input
                 type="email"
                 placeholder="Your Email"
-                className="p-2 rounded-md bg-gray-800 border border-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="p-2 rounded-md bg-gray-800 border border-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 w-full"
                 required
               />
               <button
                 type="submit"
-                className="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-300"
+                className="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-300 w-full sm:w-auto"
               >
                 Subscribe
               </button>
@@ -124,7 +124,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="mt-10 border-t border-gray-700 pt-6 flex flex-col md:flex-row justify-between items-center text-xs text-gray-400">
           <p>© {new Date().getFullYear()} Drone Delivery Service. All rights reserved.</p>
-          <div className="space-x-4 mt-4 md:mt-0">
+          <div className="space-x-4 mt-4 md:mt-0 flex flex-wrap justify-center gap-4">
             <a href="/privacy-policy" className="hover:text-blue-400 transition-colors duration-200">
               Privacy Policy
             </a>
@@ -137,6 +137,29 @@ const Footer = () => {
           </div>
         </div>
       </div>
+
+      {/* Custom CSS for better tablet responsiveness */}
+      <style jsx>{`
+        @media (min-width: 640px) and (max-width: 1023px) {
+          .grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 2rem;
+          }
+          #newsletter form {
+            flex-direction: row;
+            align-items: center;
+          }
+          #newsletter input {
+            flex-grow: 1;
+          }
+          #newsletter button {
+            width: auto;
+          }
+          .space-y-4 > :not([hidden]) ~ :not([hidden]) {
+            margin-top: 1rem;
+          }
+        }
+      `}</style>
     </footer>
   );
 };

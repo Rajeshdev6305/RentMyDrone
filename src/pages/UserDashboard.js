@@ -16,18 +16,23 @@ const UserDashboard = ({
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Load products from localStorage
+    const loginState = JSON.parse(localStorage.getItem("loginState"));
+    if (!loginState?.isLoggedIn || loginState.userType !== "user") {
+      localStorage.setItem("redirectPath", window.location.pathname); // Store current path
+      navigate("/login");
+    }
+  }, [navigate]);
+
+  useEffect(() => {
     const storedProducts = JSON.parse(localStorage.getItem("products")) || [];
     setProducts(storedProducts);
 
-    // Load cart items
     const storedCartItems =
       JSON.parse(localStorage.getItem(`cartItems_${currentUserEmail}`)) || [];
     setCartItems(storedCartItems);
 
     setLoading(false);
 
-    // Listen for storage changes from other tabs
     const handleStorageChange = (e) => {
       if (e.key === "products") {
         const updatedProducts = JSON.parse(e.newValue) || [];
@@ -108,7 +113,7 @@ const UserDashboard = ({
     return (
       <div className="flex justify-center items-center min-h-screen">
         <motion.div
-          className="rounded-full h-32 w-32 border-t-4 border-b-4 border-blue-600"
+          className="rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600 md:h-32 md:w-32"
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
         />
@@ -117,12 +122,12 @@ const UserDashboard = ({
   }
 
   return (
-    <div className="relative bg-gray-50 min-h-screen">
-      <header className="sticky top-0 z-20 bg-white shadow-md py-4 px-6 flex justify-between items-center">
+    <div className="bg-gray-50 min-h-screen">
+      <header className="sticky top-0 z-20 bg-white shadow-md py-4 px-4 sm:px-6 flex justify-between items-center">
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-3xl font-extrabold text-blue-700"
+          className="text-2xl sm:text-3xl font-extrabold text-blue-700"
         >
           RentMyDrone
         </motion.h1>
@@ -133,35 +138,34 @@ const UserDashboard = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="relative mb-8"
+        className="relative mb-8 h-64 sm:h-96 md:h-[500px]"
         style={{
           backgroundImage: `url(${categoryImages[selectedCategory]})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          height: "500px",
         }}
       >
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-60"></div>
-        <div className="relative z-10 text-white text-center py-16 flex flex-col justify-center items-center h-full">
+        <div className="relative z-10 text-white text-center py-8 sm:py-16 flex flex-col justify-center items-center h-full">
           <motion.h2
             initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.8 }}
-            className="text-4xl md:text-5xl font-bold drop-shadow-lg"
+            className="text-2xl sm:text-4xl md:text-5xl font-bold drop-shadow-lg px-4"
           >
             {categoryTexts[selectedCategory]}
           </motion.h2>
         </div>
       </motion.div>
 
-      <div className="flex justify-center mb-8 space-x-4 px-4">
+      <div className="flex flex-wrap justify-center mb-8 gap-2 sm:gap-4 px-4">
         {["All", "Marriage", "Food Delivery", "Farming"].map((category) => (
           <motion.button
             key={category}
             onClick={() => handleCategoryChange(category)}
-            whileHover={{ scale: 1.1 }}
+            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
+            className={`px-4 py-2 sm:px-6 sm:py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 ${
               selectedCategory === category
                 ? "bg-blue-600 text-white shadow-lg"
                 : "bg-gray-200 text-gray-700 hover:bg-gray-300"
@@ -172,15 +176,15 @@ const UserDashboard = ({
         ))}
       </div>
 
-      <div className="px-6 py-8">
-        <h3 className="text-2xl font-semibold mb-6 text-gray-800">
+      <div className="px-4 sm:px-6 py-8">
+        <h3 className="text-xl sm:text-2xl font-semibold mb-6 text-gray-800">
           Available Drones
         </h3>
         {filteredProducts.length === 0 ? (
           <p className="text-center text-gray-500">No products available.</p>
         ) : (
           <AnimatePresence>
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {filteredProducts.map((product) => (
                 <motion.div
                   key={product.id}
@@ -198,24 +202,26 @@ const UserDashboard = ({
                         : `${process.env.PUBLIC_URL}/${product.image || "fallback-image.jpg"}`
                     }
                     alt={product.name}
-                    className="w-full h-64 object-cover mb-4 rounded-lg"
+                    className="w-full h-48 sm:h-64 object-cover mb-4 rounded-lg"
                     onError={(e) => (e.target.src = "/fallback-image.jpg")}
                   />
-                  <h3 className="text-lg font-semibold text-gray-800">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-800">
                     {product.name || "Unnamed Product"}
                   </h3>
-                  <p className="text-sm text-gray-500">{product.category || "Uncategorized"}</p>
-                  <p className="text-sm text-blue-600 font-bold mt-1">
+                  <p className="text-xs sm:text-sm text-gray-500">
+                    {product.category || "Uncategorized"}
+                  </p>
+                  <p className="text-xs sm:text-sm text-blue-600 font-bold mt-1">
                     ₹{product.pricePerDay ? product.pricePerDay.toLocaleString() : "N/A"} / day
                   </p>
-                  <div className="flex justify-between mt-4">
+                  <div className="flex flex-col sm:flex-row justify-between mt-4 gap-2">
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       onClick={(e) => {
                         e.stopPropagation();
                         handleAddToCart(product);
                       }}
-                      className="bg-green-600 text-white px-4 py-2 text-sm rounded-lg hover:bg-green-700 transition flex items-center space-x-2"
+                      className="bg-green-600 text-white px-3 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-1 sm:gap-2"
                     >
                       <FaCartPlus />
                       <span>Add to Cart</span>
@@ -226,7 +232,7 @@ const UserDashboard = ({
                         e.stopPropagation();
                         handleViewDetails(product);
                       }}
-                      className="bg-blue-600 text-white px-4 py-2 text-sm rounded-lg hover:bg-blue-700 transition flex items-center space-x-2"
+                      className="bg-blue-600 text-white px-3 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-1 sm:gap-2"
                     >
                       <FaInfoCircle />
                       <span>Details</span>
@@ -243,3 +249,10 @@ const UserDashboard = ({
 };
 
 export default UserDashboard;
+
+
+
+
+
+
+

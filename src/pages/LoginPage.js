@@ -38,7 +38,10 @@ const LoginPage = ({ setIsLoggedIn, setUserType }) => {
           "loginState",
           JSON.stringify({ isLoggedIn: true, userType: type, currentUserEmail: email })
         );
-        navigate(type === "admin" ? "/admin" : "/user-dashboard");
+
+        const redirectPath = localStorage.getItem("redirectPath") || (type === "admin" ? "/admin" : "/user-dashboard");
+        localStorage.removeItem("redirectPath"); // Clear redirect path after use
+        navigate(redirectPath);
         return;
       }
 

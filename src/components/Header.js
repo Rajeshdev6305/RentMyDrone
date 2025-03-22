@@ -45,6 +45,8 @@ const Header = ({
         (order) => order.userEmail === auth.currentUser.email
       );
       setOrderCount(userOrders.length);
+    } else {
+      setOrderCount(0);
     }
   }, [isLoggedIn]);
 
@@ -53,7 +55,8 @@ const Header = ({
       await signOut(auth);
       setIsLoggedIn(false);
       setUserType("");
-      navigate("/login");
+      localStorage.removeItem("redirectPath"); // Clear redirect path on logout
+      navigate("/");
       setMenuOpen(false);
       setProfileMenuOpen(false);
     } catch (error) {
@@ -97,7 +100,9 @@ const Header = ({
   };
 
   const handleProductClick = () => {
-    if (userType === "admin") {
+    if (!isLoggedIn) {
+      navigate("/login");
+    } else if (userType === "admin") {
       const formSection = document.getElementById("add-product-form");
       if (formSection) formSection.scrollIntoView({ behavior: "smooth" });
     } else {
@@ -111,14 +116,22 @@ const Header = ({
   };
 
   const handleCartClick = () => {
-    navigate("/cart");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (!isLoggedIn) {
+      navigate("/login");
+    } else {
+      navigate("/cart");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
     setMenuOpen(false);
   };
 
   const handleOrdersClick = () => {
-    navigate("/my-orders");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (!isLoggedIn) {
+      navigate("/login");
+    } else {
+      navigate("/my-orders");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
     setMenuOpen(false);
   };
 
@@ -132,12 +145,8 @@ const Header = ({
   };
 
   const handleLoginClick = () => {
-    if (window.location.pathname === "/login") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
-      navigate("/login");
-    }
-    setMenuOpen(false);
+    localStorage.setItem("redirectPath", window.location.pathname); // Store current path
+    navigate("/login");
   };
 
   const handleSignUpClick = () => {
@@ -154,16 +163,24 @@ const Header = ({
   const toggleProfileMenu = () => setProfileMenuOpen(!profileMenuOpen);
 
   const handleAddProductClick = () => {
-    if (window.location.pathname === "/admin") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
-      navigate("/admin");
+    if (!isLoggedIn) {
+      navigate("/login");
+    } else if (userType === "admin") {
+      if (window.location.pathname === "/admin") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        navigate("/admin");
+      }
     }
     setMenuOpen(false);
   };
 
   const handleManageOrdersClick = () => {
-    navigate("/admin/manage-orders");
+    if (!isLoggedIn) {
+      navigate("/login");
+    } else if (userType === "admin") {
+      navigate("/admin/manage-orders");
+    }
     setMenuOpen(false);
   };
 
@@ -176,11 +193,10 @@ const Header = ({
           alt="Logo"
           className="h-10 w-10 rounded-full object-cover border-2 border-white"
         />
-        {/* Hide title in tablet view (sm to lg) */}
         <h1 className="text-lg font-bold block sm:hidden lg:block">RentMyDrone</h1>
       </div>
 
-      {/* Search Bar (Visible when logged in) */}
+      {/* Search Bar (Visible only when logged in) */}
       {isLoggedIn && (
         <SearchBar
           handleSearch={handleSearch}
@@ -195,111 +211,111 @@ const Header = ({
         <MobileMenuToggle menuOpen={menuOpen} toggleMenu={toggleMenu} />
 
         {/* Desktop Navigation */}
-        <nav
-          className={`hidden md:flex md:items-center md:space-x-3 ${
-            menuOpen ? "hidden" : "flex"
-          }`}
-        >
-          {!isLoggedIn && (
-            <NavLink
-              icon={<FaHome />}
-              label="Home"
-              onClick={handleHomeClick}
-              isActive={activeSection === "home"}
-            />
-          )}
-          {isLoggedIn && userType !== "admin" && (
-            <NavLink
-              icon={<FaProductHunt />}
-              label="Products"
-              onClick={handleProductClick}
-              isActive={activeSection === "products"}
-            />
-          )}
-          {!isLoggedIn && (
-            <>
+        <div className="hidden md:flex md:items-center">
+          <nav className={`flex md:items-center md:space-x-3 ${menuOpen ? "hidden" : "flex"}`}>
+            {/* Show Home only when not logged in */}
+            {!isLoggedIn && (
               <NavLink
-                icon={<FaSignInAlt />}
-                label="Login"
-                onClick={handleLoginClick}
-                isActive={activeSection === "login"}
+                icon={<FaHome />}
+                label="Home"
+                onClick={handleHomeClick}
+                isActive={activeSection === "home"}
               />
-              <NavLink
-                icon={<FaUserPlus />}
-                label="Sign Up"
-                onClick={handleSignUpClick}
-                isActive={activeSection === "signup"}
-              />
-            </>
-          )}
-          <NavLink
-            icon={<FaInfoCircle />}
-            label="About Us"
-            onClick={() => scrollToSection("about-us")}
-          />
-          {isLoggedIn && userType !== "admin" && (
-            <NavLink
-              icon={<FaShoppingCart />}
-              label="Cart"
-              onClick={handleCartClick}
-              isActive={activeSection === "cart"}
-              badge={cartCount > 0 ? cartCount : null}
-            />
-          )}
-          {isLoggedIn && userType !== "admin" && (
-            <NavLink
-              icon={<FaClipboardList />}
-              label="Orders"
-              onClick={handleOrdersClick}
-              isActive={activeSection === "my-orders"}
-              badge={orderCount > 0 ? orderCount : null}
-            />
-          )}
-          {isLoggedIn && userType === "admin" && (
-            <NavLink
-              icon={<FaProductHunt />}
-              label="Add Product"
-              onClick={handleAddProductClick}
-              isActive={activeSection === "add-product"}
-            />
-          )}
-          {isLoggedIn && userType === "admin" && (
-            <NavLink
-              icon={<FaClipboardList />}
-              label="Manage Orders"
-              onClick={handleManageOrdersClick}
-              isActive={activeSection === "manage-orders"}
-            />
-          )}
-        </nav>
-
-        {/* Profile Menu (Desktop) */}
-        {isLoggedIn && (
-          <div className="relative hidden md:block">
-            <button
-              onClick={toggleProfileMenu}
-              className="flex items-center space-x-2 p-2 hover:bg-gray-700 rounded-full transition-colors duration-200"
-            >
-              <FaUserCircle size={28} />
-            </button>
-            {profileMenuOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 px-4 z-50">
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center w-full py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
-                >
-                  <FaSignOutAlt className="mr-2" />
-                  <span>Logout</span>
-                </button>
-              </div>
             )}
-          </div>
-        )}
+            {isLoggedIn && userType !== "admin" && (
+              <NavLink
+                icon={<FaProductHunt />}
+                label="Products"
+                onClick={handleProductClick}
+                isActive={activeSection === "products"}
+              />
+            )}
+            {!isLoggedIn && (
+              <>
+                <NavLink
+                  icon={<FaSignInAlt />}
+                  label="Login"
+                  onClick={handleLoginClick}
+                  isActive={activeSection === "login"}
+                />
+                <NavLink
+                  icon={<FaUserPlus />}
+                  label="Sign Up"
+                  onClick={handleSignUpClick}
+                  isActive={activeSection === "signup"}
+                />
+              </>
+            )}
+            {isLoggedIn && userType !== "admin" && (
+              <NavLink
+                icon={<FaShoppingCart />}
+                label="Cart"
+                onClick={handleCartClick}
+                isActive={activeSection === "cart"}
+                badge={cartCount > 0 ? cartCount : null}
+              />
+            )}
+            {isLoggedIn && userType !== "admin" && (
+              <NavLink
+                icon={<FaClipboardList />}
+                label="Orders"
+                onClick={handleOrdersClick}
+                isActive={activeSection === "my-orders"}
+                badge={orderCount > 0 ? orderCount : null}
+              />
+            )}
+            {isLoggedIn && userType === "admin" && (
+              <NavLink
+                icon={<FaProductHunt />}
+                label="Add Product"
+                onClick={handleAddProductClick}
+                isActive={activeSection === "add-product"}
+              />
+            )}
+            {isLoggedIn && userType === "admin" && (
+              <NavLink
+                icon={<FaClipboardList />}
+                label="Manage Orders"
+                onClick={handleManageOrdersClick}
+                isActive={activeSection === "manage-orders"}
+              />
+            )}
+            <NavLink
+              icon={<FaInfoCircle />}
+              label="About Us"
+              onClick={() => scrollToSection("about-us")}
+            />
+          </nav>
+
+          {/* Profile Menu (Desktop) */}
+          {isLoggedIn && (
+            <div className="relative ml-3">
+              <button
+                onClick={toggleProfileMenu}
+                className="flex items-center space-x-2 p-2 hover:bg-gray-700 rounded-full transition-colors duration-200"
+              >
+                <FaUserCircle size={28} />
+              </button>
+              {profileMenuOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 px-4 z-50">
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center w-full py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+                  >
+                    <FaSignOutAlt className="mr-2" />
+                    <span>Logout</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Mobile Navigation */}
       {menuOpen && (
         <nav className="md:hidden absolute top-16 left-0 w-full bg-gray-800 p-4 space-y-4">
+          {/* Show Home only when not logged in */}
           {!isLoggedIn && (
             <NavLink
               icon={<FaHome />}
@@ -385,6 +401,7 @@ const Header = ({
   );
 };
 
+// Rest of the components remain unchanged
 const SearchBar = ({ handleSearch, suggestions, handleSuggestionClick, menuOpen }) => (
   <div
     className={`relative flex-1 mx-2 sm:mx-4 md:mx-6 ${

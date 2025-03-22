@@ -25,16 +25,12 @@ const ProductDetailsPage = ({ setCartItems, cartItems = [] }) => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-
-        // Check location.state first (optional, for navigation from other pages)
         const prodFromState = location.state?.product;
         if (prodFromState) {
           setProduct(prodFromState);
           setLoading(false);
           return;
         }
-
-        // Fetch from API
         const response = await fetch(`https://your-api-endpoint.com/products/${id}`);
         if (!response.ok) {
           throw new Error("Failed to fetch product");
@@ -48,7 +44,6 @@ const ProductDetailsPage = ({ setCartItems, cartItems = [] }) => {
         console.error("Error fetching product:", error);
       }
     };
-
     fetchProduct();
   }, [id, location.state]);
 
@@ -56,17 +51,62 @@ const ProductDetailsPage = ({ setCartItems, cartItems = [] }) => {
   useEffect(() => {
     if (product) {
       let price = 0;
-      if (bookingType === "day") price = bookingDuration * product.pricePerDay * quantity;
-      else if (bookingType === "month") price = bookingDuration * product.pricePerMonth * quantity;
-      else if (bookingType === "hour") price = bookingDuration * product.pricePerHour * quantity;
-      setTotalPrice(price);
+      const safeQuantity = Math.max(0, parseInt(quantity) || 0);
+      const safeDuration = Math.max(0, parseInt(bookingDuration) || 0);
+
+      if (bookingType === "day") {
+        price = safeDuration * product.pricePerDay * safeQuantity;
+      } else if (bookingType === "month") {
+        price = safeDuration * product.pricePerMonth * safeQuantity;
+      } else if (bookingType === "hour") {
+        price = safeDuration * product.pricePerHour * safeQuantity;
+      }
+      setTotalPrice(isNaN(price) ? 0 : price);
     }
   }, [bookingType, bookingDuration, quantity, product]);
 
-  // Handle booking submission
+  // Calculate actual duration between start and end dates
+  const calculateActualDuration = () => {
+    if (!startDate || !endDate) return 0;
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (bookingType === "day") {
+      const diffTime = end - start;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convert ms to days
+      return diffDays > 0 ? diffDays : 0;
+    } else if (bookingType === "month") {
+      const diffYears = end.getFullYear() - start.getFullYear();
+      const diffMonths = diffYears * 12 + (end.getMonth() - start.getMonth());
+      return diffMonths > 0 ? diffMonths : 0;
+    } else if (bookingType === "hour") {
+      if (!startHour || !endHour) return 0;
+      const startTime = new Date(`${startDate}T${startHour}:00`);
+      const endTime = new Date(`${endDate}T${endHour}:00`);
+      const diffTime = endTime - startTime;
+      const diffHours = Math.ceil(diffTime / (1000 * 60 * 60)); // Convert ms to hours
+      return diffHours > 0 ? diffHours : 0;
+    }
+    return 0;
+  };
+
+  // Handle booking submission with duration validation
   const handleBookNow = () => {
     if (!deliveryAddress || !startDate || !endDate || (bookingType === "hour" && (!startHour || !endHour))) {
       Swal.fire("Error", "Please fill in all required fields.", "error");
+      return;
+    }
+
+    const actualDuration = calculateActualDuration();
+    const safeDuration = Math.max(0, parseInt(bookingDuration) || 0);
+
+    if (safeDuration !== actualDuration) {
+      Swal.fire(
+        "Error",
+        `The selected duration (${safeDuration} ${bookingType}(s)) does not match the date range (${actualDuration} ${bookingType}(s)). Please adjust the duration or dates.`,
+        "error"
+      );
       return;
     }
 
@@ -74,7 +114,6 @@ const ProductDetailsPage = ({ setCartItems, cartItems = [] }) => {
     const existingOrders = JSON.parse(localStorage.getItem("orders")) || {};
     const userOrders = existingOrders[email] || [];
 
-    // Check if the product is already booked for the selected dates
     const isBooked = userOrders.some((order) => {
       return (
         order.product &&
@@ -103,7 +142,7 @@ const ProductDetailsPage = ({ setCartItems, cartItems = [] }) => {
       startHour: bookingType === "hour" ? startHour : null,
       endHour: bookingType === "hour" ? endHour : null,
       currentUserEmail: email,
-      userDetails: { name: "User Name", phone: "User Phone" }, // Replace with actual user data if available
+      userDetails: { name: "User Name", phone: "User Phone" },
     };
 
     userOrders.push(newOrder);
@@ -163,7 +202,6 @@ const ProductDetailsPage = ({ setCartItems, cartItems = [] }) => {
     }
   };
 
-  // Loading state
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-100">
@@ -172,7 +210,6 @@ const ProductDetailsPage = ({ setCartItems, cartItems = [] }) => {
     );
   }
 
-  // No product found
   if (!product) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -278,9 +315,9 @@ const ProductDetailsPage = ({ setCartItems, cartItems = [] }) => {
                 <input
                   type="number"
                   value={bookingDuration}
-                  onChange={(e) => setBookingDuration(Math.max(1, parseInt(e.target.value)))}
+                  onChange={(e) => setBookingDuration(Math.max(0, parseInt(e.target.value) || 0))}
                   className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  min="1"
+                  min="0"
                 />
               </div>
               <div>
@@ -288,9 +325,9 @@ const ProductDetailsPage = ({ setCartItems, cartItems = [] }) => {
                 <input
                   type="number"
                   value={quantity}
-                  onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value)))}
+                  onChange={(e) => setQuantity(Math.max(0, parseInt(e.target.value) || 0))}
                   className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  min="1"
+                  min="0"
                 />
               </div>
               <div>
